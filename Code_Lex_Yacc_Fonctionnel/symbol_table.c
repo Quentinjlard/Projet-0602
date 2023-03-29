@@ -25,6 +25,7 @@ void table_display(table_t* table) {
 
 void table_delete(table_t* table) {
     lst_symbol_delete(table->head);
+    printf("Table des symboles supprimée.\n");
 }
 
 void table_add(table_t* table, symbol_t* symbol) {

@@ -28,6 +28,7 @@ void symbol_display(symbol_t* symbol) {
 void symbol_delete(symbol_t* symbol) {
     free(symbol->name);
     free(symbol);
+    printf("Symbole supprimé.\n");
 }
 
 void symbol_set_value(symbol_t* symbol, int value) {

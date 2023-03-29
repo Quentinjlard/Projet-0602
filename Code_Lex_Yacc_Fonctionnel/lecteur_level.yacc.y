@@ -60,30 +60,29 @@ level_file: LEVEL
                     level_init(&level);
                     //level_display(&level);
                 } 
-                instruction_list END
-                {
+                instruction_list
+        ;
+
+instruction_list :  instruction
+            |   instruction_list instruction
+            |   END
+            {
                     printf("Level : \n");
                     level_display(&level);
                     table_display(tableSymbol);
                     table_delete(tableSymbol);
                 }
-        ;
-
-instruction_list :  instruction
-            |   instruction_list instruction 
-            |
             ;
 
 
 instruction :   instructionPUTNombre
             |   instructionPUTVariable
             |   instructionAffectation
-            |
             ;
 
 
 instructionPUTNombre : 
-    PUT PARO expressions VIRG  
+    PUT PARO expression VIRG  
     {
         // Création d'une nouvelle structure block_t
         block_t b;
@@ -92,7 +91,7 @@ instructionPUTNombre :
         yyval.block = b;
         // printf("1) X : %d - Y :  %d\n", b.coordX, b.coordY);
     } 
-    expressions VIRG 
+    expression VIRG 
     {
         // Création d'une nouvelle structure block_t
         block_t b;
@@ -102,7 +101,6 @@ instructionPUTNombre :
         // printf("2) X : %d - Y : %d \n",b.coordX, b.coordY);
     }
     instructionBlock PARF
-    |
     ;
 
 instructionPUTVariable :
@@ -122,7 +120,7 @@ instructionPUTVariable :
         block_t b;
         b.coordX = var1->value;
         yyval.block = b;
-    } expressions VIRG 
+    } expression VIRG 
     {
         block_t b;
         b.coordY = $6.value;
@@ -130,10 +128,10 @@ instructionPUTVariable :
     }
     instructionBlock PARF
     |
-    PUT PARO expressions  VIRG
+    PUT PARO expression  VIRG
     {
         block_t b;
-        b.coordX = $6.value;
+        b.coordX = $3.value;
         yyval.block = b;
     } IDENTIFIER VIRG 
     {
@@ -188,7 +186,6 @@ instructionPUTVariable :
         yyval.block = b;
     }
     instructionBlock PARF
-    |
     ;
 
 
@@ -227,7 +224,10 @@ instructionAffectation :
             var2 = sym2;
         }
 
-        int res = var1->value + var2->value + $5.value;
+        int res = var2->value + $5.value;
+        // printf("X = X + 1 => RES : %d = %d + %d + %d \n", res, var1->value, var2->value, $5.value);
+
+        // table_display(tableSymbol);
 
         symbol_set_value(var1, res);
     }
@@ -265,6 +265,9 @@ instructionAffectation :
         }
 
         var1->value = var1->value + var2->value + var3->value;
+        // printf("X = X + Y => RES : %d = %d + %d + %d \n", var1->value, var1->value, var2->value, var3->value);
+
+        // table_display(tableSymbol);
 
         symbol_set_value(var1, var1->value);
     }
@@ -292,10 +295,12 @@ instructionAffectation :
         }
 
         var1->value = var2->value;
+        // printf("X = X => %d = %d \n", var1->value, var2->value);
+
+        // table_display(tableSymbol);
 
         symbol_set_value(var1, var1->value);
     }
-    |
     ;
 
 instructionBlock : 
@@ -313,10 +318,9 @@ instructionBlock :
                         get_block(&level, x, y);
                         // print_block_type(block);
                     }
-                    |
                     ;
 
-expressions : 
+expression : 
     | NUM ADDITION NUM	{ $$.value = $1.value + $3.value; }
 	| NUM SOUSTRACTION NUM	{ $$.value = $1.value - $3.value; }
 	| '-' NUM			{ $$.value = -$2.value; }
@@ -332,7 +336,6 @@ expressions :
 	| '(' NUM ')'		{ $$.value = $2.value; }
     | NUM { $$.value = $1.value;}
     | NUM EGALE NUM { $$.value = $3.value;}
-    |
 	;
 
 block: BLOCK_YACC 
@@ -380,7 +383,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : BOMB \n", b.coordX, b.coordY, b.value);
                         level_add_bomb(&level, b.coordX,  b.coordY);
                     }
-     | DOOR_YACC PARO expressions PARF
+     | DOOR_YACC PARO expression PARF
                     {   
                         block_t b;
                         b.type = DOOR;
@@ -452,7 +455,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : PROBE \n", b.coordX, b.coordY, b.value);
                         level_add_probe(&level, b.coordX,  b.coordY);
                     }
-     | KEY_YACC PARO expressions PARF
+     | KEY_YACC PARO expression PARF
                     {
                         block_t b;
                         b.type = KEY;
@@ -469,7 +472,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : KEY \n", b.coordX, b.coordY, b.value);
                         level_add_key(&level, b.coordX, b.coordY, b.value);
                     }
-     | GATE_YACC PARO expressions PARF 
+     | GATE_YACC PARO expression PARF 
                     {
                         block_t b;
                         b.type = GATE;
