@@ -1,5 +1,3 @@
-
-
 prc ladder(x,y,h)
 end
 
@@ -12,12 +10,8 @@ end
 prc frect(x1,y1,x2,y2,b)
 end
 
-
-
 prc vline(x,y,l,b)
 end
 
 level
 end
-
-

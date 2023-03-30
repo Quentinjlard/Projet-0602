@@ -4,7 +4,7 @@
 
 EXEC = lecteur_level
 ANALYSER = lecteur_level
-OBJECTS = lex.yy.o y.tab.o level.o block.o symbol.o symbol_lst.o symbol_table.o
+OBJECTS = lex.yy.o y.tab.o level.o block.o symbol.o symbol_lst.o symbol_table.o instructions.o instructions_lst.o
 PROJECT_NAME = lecteur_level
 
 
@@ -98,13 +98,16 @@ archive: clean
 	@echo "Done."
 
 # DEPENDANCIES
-lex.yy.o: lex.yy.c symbol_table.h symbol_lst.h symbol.h block.h level.h \
- y.tab.h
-y.tab.o: y.tab.c symbol_table.h symbol_lst.h symbol.h block.h level.h \
- y.tab.h
+lex.yy.o: lex.yy.c instructions_lst.h instructions.h symbol.h block.h \
+ symbol_table.h symbol_lst.h level.h y.tab.h
+y.tab.o: y.tab.c instructions_lst.h instructions.h symbol.h block.h \
+ symbol_table.h symbol_lst.h level.h y.tab.h
 level.o: level.c block.h level.h
 block.o: block.c block.h level.h
 symbol.o: symbol.c symbol.h
 symbol_lst.o: symbol_lst.c symbol_lst.h symbol.h
 symbol_table.o: symbol_table.c symbol_table.h symbol_lst.h symbol.h
+instructions.o: instructions.c instructions.h symbol.h block.h
+instructions_lst.o: instructions_lst.c instructions_lst.h instructions.h \
+ symbol.h block.h
 lecteur_level.o: lecteur_level.c block.h level.h

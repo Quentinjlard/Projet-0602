@@ -67,3 +67,21 @@ instruction :   instructionPUTNombre
             |   instructionPUTVariable
             |   affectation
             ;
+
+
+| FOR_YACC PARO SYMBOLE EGALE SYMBOLE PVRIG SYMBOLE SUPEGAL SYMBOLE ADDITION SYMBOLE SOUSTRACTION NUM PVRIG SYMBOLE EGALE SYMBOLE ADDITION NUM PARF 
+            {
+                printf("FOR_LOOP_PROC \n");
+            } END
+            |FOR_YACC PARO affectation PVRIG affectation SUP affectation PVRIG affectation PARF 
+            {
+                printf("FOR_LOOP_PROC \n");
+            } END
+            | FOR_YACC PARO affectation PVRIG PVRIG END 
+            {
+                printf("FOR_LOOP_PROC \n");
+            } END
+            | FOR_YACC PARO affectation PVRIG affectation SUPEGAL affectation PVRIG affectation PARF 
+            {
+                printf("FOR_LOOP_PROC \n");
+            } END

@@ -36,17 +36,17 @@
 %token EMPTY_YACC BLOCK_YACC TRAP_YACC LIFE_YACC BOMB_YACC DOOR_YACC ENTER_YACC EXIT_YACC LADDER_YACC ROBOT_YACC PROBE_YACC KEY_YACC GATE_YACC
 %token BLOCK_VAL_YACC
 
-%token GET
+%token GET PUT
 
 
-%token PARO PARF VIRG PUT NUM PVRIG
+%token PARO PARF VIRG NUM PVRIGULE
 %token SUP
 
 %token ADDITION SOUSTRACTION DIVISION MULTIPLICATION EGALE SUPEGAL
 
 %token SYMBOLE
 
-%token  PRC_YACC LADDER_PRC_YACC RECT_YACC FRECT_YACC HLINE_YACC VLINE_YACC 
+%token PRC_YACC LADDER_PRC_YACC RECT_YACC FRECT_YACC HLINE_YACC VLINE_YACC 
 
 %token IF_YACC THEN_YACC ELSE_YACC
 
@@ -66,8 +66,13 @@ instruction_proc_list: instruction_proc
                 | instruction_proc_list instruction_proc
                 ;
 
-instruction_list :  instruction
-            |   instruction_list instruction
+instruction_list :  instruction_list instruction
+            |   instruction
+            ;
+
+instruction :   instructionPUTNombre
+            |   instructionPUTVariable
+            |   affectation
             |   END
             {
                     printf("Level : \n");
@@ -75,11 +80,6 @@ instruction_list :  instruction
                     table_display(tableSymbol);
                     table_delete(tableSymbol);
                 }
-            ;
-
-instruction :   instructionPUTNombre
-            |   instructionPUTVariable
-            |   affectation
             ;
 
 level_file: LEVEL 
@@ -91,13 +91,7 @@ level_file: LEVEL
                     level_init(&level);
                     //level_display(&level);
                 } 
-                instruction_list END
-                {
-                    printf("Level : \n");
-                    level_display(&level);
-                    table_display(tableSymbol);
-                    table_delete(tableSymbol);
-                }
+                instruction_list
         ;
 
 
@@ -110,35 +104,41 @@ instruction_proc :
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }    LADDER_PROC  END
+                    }    LADDER_PROC FOR_LOOP_PROC END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       RECT_PROC    END
+                    }       RECT_PROC FOR_LOOP_PROC END FOR_LOOP_PROC END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       FRECT_PROC   END
+                    }       FRECT_PROC FOR_LOOP_PROC FOR_LOOP_PROC END END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       HLINE_PROC    END
+                    }       HLINE_PROC FOR_LOOP_PROC END   
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       VLINE_PROC    END
+                    }       VLINE_PROC FOR_LOOP_PROC END
+                | FOR_LOOP_PROC
+                |   END
+                {
+                    table_display(tableSymbol);
+                }
+                | level_file
                 ;
     ;
 
@@ -198,6 +198,63 @@ VLINE_PROC : VLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG 
                 data->block = $9.symbol->name;
                 add_instruction(instruction_list_C, create_instruction(VLINE_INSTRUCTION, data));
             };
+
+FOR_LOOP_PROC : 
+            FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL affectation PVRIGULE affectation PARF
+            {
+                printf("1. FOR_LOOP_PROC \n");
+                for_loop_data_t* data = (for_loop_data_t*)malloc(sizeof(for_loop_data_t));
+
+                data->variable = $3.symbol;
+                data->start = $5.symbol;
+                data->end = $7.symbol;
+                data->step = $9.symbol;
+
+                add_instruction(instruction_list_C, create_instruction(FOR_LOOP_INSTRUCTION, data));
+            }
+            | FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL SYMBOLE ADDITION SYMBOLE SOUSTRACTION NUM PVRIGULE affectation PARF
+            {
+                printf("2. FOR_LOOP_PROC \n");
+                for_loop_data_t* data = (for_loop_data_t*)malloc(sizeof(for_loop_data_t));
+                symbol_t* symbol = symbol_create("fin_loop", 0);
+                int value = $7.symbol->value + $9.symbol->value - $11.value;
+                symbol_set_value(symbol, value);
+
+                data->variable = $3.symbol;
+                data->start = $5.symbol;
+                data->end = symbol;
+                data->step = $9.symbol;
+
+                add_instruction(instruction_list_C, create_instruction(FOR_LOOP_INSTRUCTION, data));
+
+            }
+            | FOR_YACC PARO affectation PVRIGULE affectation SUP affectation ADDITION affectation PVRIGULE affectation PARF
+            {
+                printf("3. FOR_LOOP_PROC \n");
+                for_loop_data_t* data = (for_loop_data_t*)malloc(sizeof(for_loop_data_t));
+                symbol_t* symbol = symbol_create("finloop", 0);
+                int value = $7.symbol->value + $9.symbol->value;
+                symbol_set_value(symbol, value);
+
+                data->variable = $3.symbol;
+                data->start = $5.symbol;
+                data->end = symbol;
+                data->step = $9.symbol;
+
+                add_instruction(instruction_list_C, create_instruction(FOR_LOOP_INSTRUCTION, data));
+            }
+            ;
+
+PUT_PROC : PUT PARO affectation VIRG affectation VIRG affectation PARF {
+                printf("PUT_PROC \n");
+                put_data_t* data = (put_data_t*)malloc(sizeof(put_data_t));
+                
+                data->x = $3.symbol;
+                data->y = $5.symbol;
+                data->block = $7.symbol->name;
+                add_instruction(instruction_list_C, create_instruction(PUT_INSTRUCTION, data));
+            }
+            ;
 
 instructionPUTNombre : 
     PUT PARO expression VIRG  
@@ -322,7 +379,7 @@ affectation :
                     var = sym;
                 }
                 symbol_set_value(var, var->value);
-                symbol_display(var);
+                // symbol_display(var);
             }
             |
             SYMBOLE EGALE NUM 
@@ -342,7 +399,7 @@ affectation :
                 var->value = $3.value;
 
                 symbol_set_value(var, var->value);
-                symbol_display(var);
+                // symbol_display(var);
             }
             |
             SYMBOLE EGALE SYMBOLE 
@@ -369,7 +426,7 @@ affectation :
                 }
 
                 symbol_set_value(var, var2->value);
-                symbol_display(var);
+                // symbol_display(var);
             }
             |
             SYMBOLE EGALE SYMBOLE ADDITION NUM {
@@ -398,7 +455,7 @@ affectation :
                 var1->value = var2->value + $5.value;
 
                 symbol_set_value(var1, var1->value);
-                symbol_display(var1);
+                // symbol_display(var1);
             }
             |
             SYMBOLE EGALE SYMBOLE ADDITION SYMBOLE {
@@ -437,53 +494,13 @@ affectation :
                 var1->value = var2->value + var3->value;
 
                 symbol_set_value(var1, var1->value);
-                symbol_display(var1);
-            }
-            |
-            SYMBOLE EGALE SYMBOLE ADDITION SYMBOLE {
-                // printf("Affectation 5\n");
-                symbol_t *sym1, *var1, *symbol1;
-                symbol_t *sym2, *var2, *symbol2;
-                symbol_t *sym3, *var3, *symbol3;
-
-                sym1 = table_search(tableSymbol, $1.lettre);
-                if (sym1 == NULL) {
-                    symbol1 = symbol_create($1.lettre, 0);
-                    table_add(tableSymbol, symbol1);
-                    var1 = symbol1;
-                } else {
-                    var1 = sym1;
-                }
-
-                sym2 = table_search(tableSymbol, $3.lettre);
-                if (sym2 == NULL) {
-                    symbol2 = symbol_create($3.lettre, 0);
-                    table_add(tableSymbol, symbol2);
-                    var2 = symbol2;
-                } else {
-                    var2 = sym2;
-                }
-
-                sym3 = table_search(tableSymbol, $5.lettre);
-                if (sym3 == NULL) {
-                    symbol3 = symbol_create($5.lettre, 0);
-                    table_add(tableSymbol, symbol3);
-                    var3 = symbol3;
-                } else {
-                    var3 = sym3;
-                }
-
-                var1->value = var1->value + var2->value + var3->value;
-
-                symbol_set_value(var1, var1->value);
-                symbol_display(var1);
+                // symbol_display(var1);
             }
             ;
 
 expression : 
     | NUM ADDITION NUM	{ $$.value = $1.value + $3.value; }
 	| NUM SOUSTRACTION NUM	{ $$.value = $1.value - $3.value; }
-	| '-' NUM			{ $$.value = -$2.value; }
 	| NUM MULTIPLICATION NUM	{ $$.value = $1.value * $3.value; }
 	| NUM DIVISION NUM	{
 		if ($3.value == 0) {
