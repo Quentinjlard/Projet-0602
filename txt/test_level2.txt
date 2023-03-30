@@ -1,17 +1,28 @@
 prc ladder(x,y,h)
-end
-
-prc hline(x,y,l,b)
+  for(i=y;i<=y+h-1;i=i+1)
+  end
 end
 
 prc rect(x1,y1,x2,y2,b)
+  for(i=x1;i<=x2;i=i+1)
+  end
+  for(i=y1;i<=y2;i=i+1)
+  end
 end
 
 prc frect(x1,y1,x2,y2,b)
+  for(i=x1;i<=x2;i=i+1)
+    for(j=y1;j<=y2;j=j+1)
+    end
+  end
+end
+
+prc hline(x,y,l,b)
+  for(i=x;i<x+l;i=i+1)
+  end
 end
 
 prc vline(x,y,l,b)
-end
-
-level
+  for(i=y;i<y+l;i=i+1)
+  end
 end

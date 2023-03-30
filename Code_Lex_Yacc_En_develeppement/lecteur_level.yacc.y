@@ -104,35 +104,35 @@ instruction_proc :
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }    LADDER_PROC FOR_LOOP_PROC END
+                    }    LADDER_PROC FOR_LOOP_PROC PUT_PROC END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       RECT_PROC FOR_LOOP_PROC END FOR_LOOP_PROC END
+                    }       RECT_PROC FOR_LOOP_PROC PUT_PROC PUT_PROC END FOR_LOOP_PROC PUT_PROC PUT_PROC END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       FRECT_PROC FOR_LOOP_PROC FOR_LOOP_PROC END END
+                    }       FRECT_PROC FOR_LOOP_PROC FOR_LOOP_PROC PUT_PROC END END
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       HLINE_PROC FOR_LOOP_PROC END   
+                    }       HLINE_PROC FOR_LOOP_PROC PUT_PROC END   
                 |   PRC_YACC{
                             if (instruction_list_C == NULL)
                                 instruction_list_C = new_instruction_list();
                             if(tableSymbol == NULL)
                                 tableSymbol = table_create();
                             // table_display(tableSymbol);
-                    }       VLINE_PROC FOR_LOOP_PROC END
+                    }       VLINE_PROC FOR_LOOP_PROC PUT_PROC END
                 | FOR_LOOP_PROC
                 |   END
                 {
@@ -245,14 +245,24 @@ FOR_LOOP_PROC :
             }
             ;
 
-PUT_PROC : PUT PARO affectation VIRG affectation VIRG affectation PARF {
+PUT_PROC : PUT PARO affectation VIRG affectation VIRG LADDER_YACC PARF  {
                 printf("PUT_PROC \n");
-                put_data_t* data = (put_data_t*)malloc(sizeof(put_data_t));
+                // put_data_t* data = (put_data_t*)malloc(sizeof(put_data_t));
                 
-                data->x = $3.symbol;
-                data->y = $5.symbol;
-                data->block = $7.symbol->name;
-                add_instruction(instruction_list_C, create_instruction(PUT_INSTRUCTION, data));
+                // data->x = $3.symbol;
+                // data->y = $5.symbol;
+                // data->block = $7.symbol->name;
+                // add_instruction(instruction_list_C, create_instruction(PUT_INSTRUCTION, data));
+            }
+            |
+            PUT PARO affectation VIRG affectation VIRG affectation PARF  {
+                printf("PUT_PROC \n");
+                // put_data_t* data = (put_data_t*)malloc(sizeof(put_data_t));
+                
+                // data->x = $3.symbol;
+                // data->y = $5.symbol;
+                // data->block = $7.symbol->name;
+                // add_instruction(instruction_list_C, create_instruction(PUT_INSTRUCTION, data));
             }
             ;
 
