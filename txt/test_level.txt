@@ -1,0 +1,6 @@
+prc ladder(x,y,h)
+  for(i=y;i<=y+h-1;i=i+1)
+    put(x,i,LADDER)
+  end
+end
+

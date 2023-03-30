@@ -3,6 +3,8 @@
     #include <stdlib.h>
     #include <wchar.h>
 
+    #include "instructions_lst.h"
+    
     #include "symbol_table.h"
     
     #include "block.h"
@@ -10,7 +12,8 @@
 
     #include "y.tab.h"
 
-    table_t* tableSymbol;
+    instruction_list_t* instruction_list_C = NULL;
+    table_t* tableSymbol = NULL;
     
     level_t level;
     block_t block;
@@ -25,53 +28,43 @@
     int coordX;
     int coordY;
     char* lettre;
+    symbol_t* symbol;
 }
 
 %token LEVEL END
 
-%token PUT GET
+%token EMPTY_YACC BLOCK_YACC TRAP_YACC LIFE_YACC BOMB_YACC DOOR_YACC ENTER_YACC EXIT_YACC LADDER_YACC ROBOT_YACC PROBE_YACC KEY_YACC GATE_YACC
+%token BLOCK_VAL_YACC
 
-%token EMPTY_YACC BLOCK_YACC TRAP_YACC LIFE_YACC BOMB_YACC DOOR_YACC ENTER_YACC EXIT_YACC LADDER_YACC ROBOT_YACC PROBE_YACC KEY_YACC GATE_YACC 
+%token GET
 
-%token PRC_YACC LADDER_PRC_YACC RECT_YACC FRECT_YACC HLINE_YACC VLINE_YACC FOR_YACC WHILE_YACC 
 
-%token NUM
+%token PARO PARF VIRG PUT NUM PVRIG
+%token SUP
+
+%token ADDITION SOUSTRACTION DIVISION MULTIPLICATION EGALE SUPEGAL
 
 %token SYMBOLE
 
-%token VIRG
+%token  PRC_YACC LADDER_PRC_YACC RECT_YACC FRECT_YACC HLINE_YACC VLINE_YACC 
 
-%token PARO PARF
+%token IF_YACC THEN_YACC ELSE_YACC
 
-%token ADDITION SOUSTRACTION MULTIPLICATION DIVISION EGALE 
-
+%token WHILE_YACC DO_YACC FOR_YACC TO_YACC STEP_YACC
 
 %%
 
 file: level_file_list
+    | instruction_proc_list
     ;
 
 level_file_list: level_file
                 | level_file_list level_file
             ;
 
-instruction :   instructionPUTNombre
-            |   instructionPUTVariable
-            |   affectation
-            ;
-
-
-level_file: LEVEL 
-                {
-                    //printf("Table \n");
-                    tableSymbol = table_create();
-                    //table_display(tableSymbol);
-                    //printf("Level \n");
-                    level_init(&level);
-                    //level_display(&level);
-                } 
-                instruction_list
-        ;
+instruction_proc_list: instruction_proc
+                | instruction_proc_list instruction_proc
+                ;
 
 instruction_list :  instruction
             |   instruction_list instruction
@@ -83,6 +76,128 @@ instruction_list :  instruction
                     table_delete(tableSymbol);
                 }
             ;
+
+instruction :   instructionPUTNombre
+            |   instructionPUTVariable
+            |   affectation
+            ;
+
+level_file: LEVEL 
+                {
+                    //printf("Table \n");
+                    if(tableSymbol == NULL)
+                        tableSymbol = table_create();
+                    //printf("Level \n");
+                    level_init(&level);
+                    //level_display(&level);
+                } 
+                instruction_list END
+                {
+                    printf("Level : \n");
+                    level_display(&level);
+                    table_display(tableSymbol);
+                    table_delete(tableSymbol);
+                }
+        ;
+
+
+instruction_proc : 
+                
+                    PRC_YACC
+                    {
+                            if (instruction_list_C == NULL)
+                                instruction_list_C = new_instruction_list();
+                            if(tableSymbol == NULL)
+                                tableSymbol = table_create();
+                            // table_display(tableSymbol);
+                    }    LADDER_PROC  END
+                |   PRC_YACC{
+                            if (instruction_list_C == NULL)
+                                instruction_list_C = new_instruction_list();
+                            if(tableSymbol == NULL)
+                                tableSymbol = table_create();
+                            // table_display(tableSymbol);
+                    }       RECT_PROC    END
+                |   PRC_YACC{
+                            if (instruction_list_C == NULL)
+                                instruction_list_C = new_instruction_list();
+                            if(tableSymbol == NULL)
+                                tableSymbol = table_create();
+                            // table_display(tableSymbol);
+                    }       FRECT_PROC   END
+                |   PRC_YACC{
+                            if (instruction_list_C == NULL)
+                                instruction_list_C = new_instruction_list();
+                            if(tableSymbol == NULL)
+                                tableSymbol = table_create();
+                            // table_display(tableSymbol);
+                    }       HLINE_PROC    END
+                |   PRC_YACC{
+                            if (instruction_list_C == NULL)
+                                instruction_list_C = new_instruction_list();
+                            if(tableSymbol == NULL)
+                                tableSymbol = table_create();
+                            // table_display(tableSymbol);
+                    }       VLINE_PROC    END
+                ;
+    ;
+
+LADDER_PROC : LADDER_PRC_YACC PARO affectation VIRG affectation VIRG affectation PARF {
+                printf("LADDER_PRC \n");
+                ladder_data_t* data = (ladder_data_t*)malloc(sizeof(ladder_data_t));
+                
+                data->x = $3.symbol;
+                data->y = $5.symbol;
+                data->h = $7.symbol;
+                add_instruction(instruction_list_C, create_instruction(LADDER_INSTRUCTION, data));
+            }
+            ;
+
+RECT_PROC : RECT_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation VIRG affectation PARF {
+                printf("RECT_PRC \n");
+                rect_data_t* data = (rect_data_t*)malloc(sizeof(rect_data_t));
+                
+                data->x1 = $3.symbol;
+                data->y1 = $5.symbol;
+                data->x2 = $7.symbol;
+                data->y2 = $9.symbol;
+                data->block = $11.symbol->name;
+                add_instruction(instruction_list_C, create_instruction(RECT_INSTRUCTION, data));
+            };
+
+FRECT_PROC : FRECT_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation VIRG affectation PARF {
+                printf("FRECT_PRC \n");
+                rect_data_t* data = (rect_data_t*)malloc(sizeof(rect_data_t));
+                
+                data->x1 = $3.symbol;
+                data->y2 = $5.symbol;
+                data->x2 = $7.symbol;
+                data->y2 = $9.symbol;
+                data->block = $11.symbol->name;
+                add_instruction(instruction_list_C, create_instruction(FRECT_INSTRUCTION, data));
+            };
+
+HLINE_PROC : HLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF {
+                printf("HLINE_PROC \n");
+                hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
+                
+                data->x = $3.symbol;
+                data->y = $5.symbol;
+                data->l = $7.symbol;
+                data->block = $9.symbol->name;
+                add_instruction(instruction_list_C, create_instruction(HLINE_INSTRUCTION, data));
+            };
+
+VLINE_PROC : VLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF {
+                printf("VLINE_PROC \n");
+                hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
+                
+                data->x = $3.symbol;
+                data->y = $5.symbol;
+                data->l = $7.symbol;
+                data->block = $9.symbol->name;
+                add_instruction(instruction_list_C, create_instruction(VLINE_INSTRUCTION, data));
+            };
 
 instructionPUTNombre : 
     PUT PARO expression VIRG  
@@ -190,7 +305,6 @@ instructionPUTVariable :
     }
     instructionBlock PARF
     ;
-
 
 affectation : 
             SYMBOLE 
@@ -384,7 +498,6 @@ expression :
     | NUM EGALE NUM { $$.value = $3.value;}
 	;
 
-
 instructionBlock : 
                     block
                     {
@@ -414,7 +527,7 @@ block: BLOCK_YACC
                         level_add_block(&level, b.coordX,  b.coordY);
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : %s \n", b.coordX, b.coordY, b.value, print_block_type(b));
                     }
-     | TRAP_YACC 
+    | TRAP_YACC 
                     {
                         block_t b;
                         b.type = TRAP;
@@ -425,7 +538,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : TRAP \n", b.coordX, b.coordY, b.value);
                         level_add_trap(&level, b.coordX,  b.coordY);
                     }
-     | LIFE_YACC
+    | LIFE_YACC
                     {
                         block_t b;
                         b.type = LIFE;
@@ -436,7 +549,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : LIFE \n", b.coordX, b.coordY, b.value);
                         level_add_life(&level, b.coordX,  b.coordY);
                     }
-     | BOMB_YACC 
+    | BOMB_YACC 
                     {
                         block_t b;
                         b.type = BOMB;
@@ -447,7 +560,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : BOMB \n", b.coordX, b.coordY, b.value);
                         level_add_bomb(&level, b.coordX,  b.coordY);
                     }
-     | DOOR_YACC PARO expression PARF
+    | DOOR_YACC PARO expression PARF
                     {   
                         block_t b;
                         b.type = DOOR;
@@ -464,7 +577,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : DOOR \n", b.coordX, b.coordY, b.value);
                         level_add_door(&level, b.coordX, b.coordY, b.value);
                     }
-     | ENTER_YACC 
+    | ENTER_YACC 
                     {
                         block_t b;
                         b.type = ENTER;
@@ -475,7 +588,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : ENTER \n", b.coordX, b.coordY, b.value);
                         level_add_start(&level, b.coordX,  b.coordY);
                     }
-     | EXIT_YACC 
+    | EXIT_YACC 
                     {
                         block_t b;
                         b.type = EXIT;
@@ -486,7 +599,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : EXIT \n", b.coordX, b.coordY, b.value);
                         level_add_exit(&level, b.coordX,  b.coordY);
                     }
-     | LADDER_YACC 
+    | LADDER_YACC 
                     {
                         block_t b;
                         b.type = LADDER;
@@ -497,7 +610,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : LADDER \n", b.coordX, b.coordY, b.value);
                         level_add_ladder(&level, b.coordX,  b.coordY);
                     }
-     | ROBOT_YACC 
+    | ROBOT_YACC 
                     {
                         block_t b;
                         b.type = ROBOT;
@@ -508,7 +621,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : ROBOT \n", b.coordX, b.coordY, b.value);
                         level_add_robot(&level, b.coordX,  b.coordY);
                     }
-     | PROBE_YACC 
+    | PROBE_YACC 
                     {
                         block_t b;
                         b.type = PROBE;
@@ -519,7 +632,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : PROBE \n", b.coordX, b.coordY, b.value);
                         level_add_probe(&level, b.coordX,  b.coordY);
                     }
-     | KEY_YACC PARO expression PARF
+    | KEY_YACC PARO expression PARF
                     {
                         block_t b;
                         b.type = KEY;
@@ -536,7 +649,7 @@ block: BLOCK_YACC
                         // printf("X : %2d - Y : %2d - Value : %2d - Block Name : KEY \n", b.coordX, b.coordY, b.value);
                         level_add_key(&level, b.coordX, b.coordY, b.value);
                     }
-     | GATE_YACC PARO expression PARF 
+    | GATE_YACC PARO expression PARF 
                     {
                         block_t b;
                         b.type = GATE;

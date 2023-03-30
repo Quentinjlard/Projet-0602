@@ -1,0 +1,720 @@
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <wchar.h>
+
+    #include "symbol_table.h"
+    
+    #include "block.h"
+    #include "level.h"
+    #include "instructions_lst.h"
+
+    #include "y.tab.h"
+
+    table_t* tableSymbol;
+    
+    level_t level;
+    block_t block;
+
+    instruction_list_t* instruction_list;
+
+    void yyerror(const char *msg);
+    
+%}
+
+%union {
+    block_t block;
+    int value;
+    int coordX;
+    int coordY;
+    char* lettre;
+}
+
+%token LEVEL END
+
+%token EMPTY_YACC BLOCK_YACC TRAP_YACC LIFE_YACC BOMB_YACC DOOR_YACC ENTER_YACC EXIT_YACC LADDER_YACC ROBOT_YACC PROBE_YACC KEY_YACC GATE_YACC
+%token BLOCK_VAL_YACC
+
+%token GET
+
+
+%token PARO PARF VIRG PUT NUM PVRIG
+
+
+%token ADDITION SOUSTRACTION DIVISION MULTIPLICATION EGALE SUPEGAL
+
+%token SYMBOLE
+
+%token  PRC_YACC LADDER_PRC_YACC RECT_YACC FRECT_YACC HLINE_YACC VLINE_YACC 
+
+%token IF_YACC THEN_YACC ELSE_YACC
+
+%token WHILE_YACC DO_YACC FOR_YACC TO_YACC STEP_YACC
+
+%%
+
+file: 
+        level_file_list
+    | instruction_proc_list
+    {
+        instruction_list = new_instruction_list();
+    }
+    ;
+
+level_file_list: level_file
+                | level_file_list level_file
+                ;
+
+instruction_proc_list : 
+                        instruction_proc
+                        | instruction_proc_list instruction_proc
+                        ;
+
+instruction_proc : 
+                    PRC_YACC  ASSIGNMENT_PRC    END
+                |   PRC_YACC  CONDITIONAL_PRC   END
+                |   PRC_YACC  WHILE_LOOP_PRC    END
+                |   PRC_YACC  FOR_LOOP_PRC      END
+                |   PRC_YACC  LADDER_PRC        END
+                |   PRC_YACC  RECT_PRC          END
+                |   PRC_YACC  FRECT_PRC         END
+                |   PRC_YACC  HLINE_PRC         END
+                |   PRC_YACC  VLINE_PRC         END
+                |   PRC_YACC  GATE_PRC          END
+                ;
+
+ASSIGNMENT_PRC : SYMBOLE EGALE NUM {
+                assignment_data_t* data = (assignment_data_t*)malloc(sizeof(assignment_data_t));
+                data->variable_name = $1.lettre;
+                data->value_expression = $3;
+                $$ = new_instruction(ASSIGNMENT_INSTRUCTION, data);
+                add_instruction(memory, $$);
+            }
+            ;
+
+CONDITIONAL_PRC : IF_YACC expression THEN_YACC instruction_proc_list ELSE_YACC instruction_proc_list END {
+                    conditional_data_t* data = (conditional_data_t*)malloc(sizeof(conditional_data_t));
+                    data->condition_expression = $2;
+                    data->then_instructions = $4;
+                    data->else_instructions = $6;
+                    $$ = new_instruction(CONDITIONAL_INSTRUCTION, data);
+                    add_instruction(memory, $$);
+                }
+            | IF_YACC expression THEN_YACC instruction_proc_list END {
+                    conditional_data_t* data = (conditional_data_t*)malloc(sizeof(conditional_data_t));
+                    data->condition_expression = $2;
+                    data->then_instructions = $4;
+                    data->else_instructions = NULL;
+                    $$ = new_instruction(CONDITIONAL_INSTRUCTION, data);
+                    add_instruction(memory, $$);
+                }
+            ;
+
+WHILE_LOOP_PRC : WHILE_YACC expression DO_YACC instruction_proc_list END {
+                    while_loop_data_t* data = (while_loop_data_t*)malloc(sizeof(while_loop_data_t));
+                    data->condition_expression = $2;
+                    data->loop_instructions = $4;
+                    $$ = new_instruction(WHILE_LOOP_INSTRUCTION, data);
+                    add_instruction(memory, $$);
+                }
+            ;
+
+FOR_LOOP_PRC : FOR_YACC SYMBOLE EGALE expression TO_YACC expression STEP_YACC expression DO_YACC instruction_proc_list END {
+                for_loop_data_t* data = (for_loop_data_t*)malloc(sizeof(for_loop_data_t));
+                data->variable_name = $2;
+                data->start_expression = $4;
+                data->end_expression = $6;
+                data->step_expression = $8;
+                data->loop_instructions = $10;
+                $$ = new_instruction(FOR_LOOP_INSTRUCTION, data);
+                add_instruction(memory, $$);
+            }
+            ;
+
+LADDER_PRC : LADDER_PRC_YACC PARO expression VIRG expression VIRG expression PARF expression {
+                printf("LADDER_PRC \n");
+                ladder_data_t* data = (ladder_data_t*)malloc(sizeof(ladder_data_t));
+                data->x = $3;
+                data->y = $5;
+                data->h = $7;
+                $$ = new_instruction(LADDER_INSTRUCTION, data);
+                add_instruction(memory, $$);
+            }
+            ;
+
+RECT_PRC : RECT_YACC PARO expression VIRG expression VIRG expression VIRG expression VIRG block PARF 
+{
+    rect_data_t* data = (rect_data_t*)malloc(sizeof(rect_data_t));
+    data->x1 = $3;
+    data->y1 = $5;
+    data->x2 = $7;
+    data->y2 = $9;
+    data->b = yytext;
+    $$ = create_instruction(RECT_INSTRUCTION, data);
+}
+
+FRECT_PRC : FRECT_YACC PARO expression VIRG expression VIRG expression VIRG expression VIRG block PARF 
+{
+    frect_data_t* data = (frect_data_t*)malloc(sizeof(frect_data_t));
+    data->x1 = $3;
+    data->y1 = $5;
+    data->x2 = $7;
+    data->y2 = $9;
+    data->b = yytext;
+    $$ = create_instruction(FRECT_INSTRUCTION, data);
+}
+
+HLINE_PRC : HLINE_YACC PARO expression VIRG expression VIRG expression VIRG block PARF 
+{
+    hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
+    data->x = $3;
+    data->y = $5;
+    data->l = $7;
+    data->b = yytext;
+    $$ = create_instruction(HLINE_INSTRUCTION, data);
+}
+
+VLINE_PRC : VLINE_YACC PARO expression VIRG expression VIRG expression VIRG block PARF 
+{
+    vline_data_t* data = (vline_data_t*)malloc(sizeof(vline_data_t));
+    data->x = $3;
+    data->y = $5;
+    data->l = $7;
+    data->b = yytext;
+    $$ = create_instruction(VLINE_INSTRUCTION, data);
+}
+
+GATE_PRC : GATE_YACC PARO expression VIRG expression VIRG expression PARF 
+{
+    gate_data_t* data = (gate_data_t*)malloc(sizeof(gate_data_t));
+    data->x = $3;
+    data->y = $5;
+    data->n = $7;
+    $$ = create_instruction(GATE_INSTRUCTION, data);
+}
+
+instruction_proc : 
+                ASSIGNMENT_PRC {
+                    $$ = create_instruction(ASSIGNMENT_INSTRUCTION, $1);
+                }
+                | CONDITIONAL_PRC {
+                    $$ = create_instruction(CONDITIONAL_INSTRUCTION, $1);
+                }
+                | WHILE_LOOP_PRC {
+                    $$ = create_instruction(WHILE_LOOP_INSTRUCTION, $1);
+                }
+                | FOR_LOOP_PRC {
+                    $$ = create_instruction(FOR_LOOP_INSTRUCTION, $1);
+                }
+                | LADDER_PRC PARO expression VIRG expression VIRG expression PARF 
+                {
+                    ladder_data_t* data = (ladder_data_t*)malloc(sizeof(ladder_data_t));
+                    data->x = $3;
+                    data->y = $5;
+                    data->h = $7;
+                    $$ = create_instruction(LADDER_INSTRUCTION, data);
+                }
+                | RECT_PRC
+                | FRECT_PRC
+                | HLINE_PRC
+                | VLINE_PRC
+                | GATE_PRC
+                ;
+
+instruction_proc : ASSIGNMENT_PRC 
+                    {
+                        $$ = create_instruction(ASSIGNMENT_INSTRUCTION, $1);
+                    }
+                    | CONDITIONAL_PRC 
+                    {
+                        $$ = create_instruction(CONDITIONAL_INSTRUCTION, $1);
+                    }
+                    | WHILE_LOOP_PRC 
+                    {
+                        $$ = create_instruction(WHILE_LOOP_INSTRUCTION, $1);
+                    }
+                    | FOR_LOOP_PRC {
+                        $$ = create_instruction(FOR_LOOP_INSTRUCTION, $1);
+                    }
+                    | LADDER_PRC PARO expression VIRG expression VIRG expression PARF {
+                        ladder_data_t* data = (ladder_data_t*)malloc(sizeof(ladder_data_t));
+                        data->x = $3;
+                        data->y = $5;
+                        data->h = $7;
+                        $$ = create_instruction(LADDER_INSTRUCTION, data);
+                    }
+                    | RECT_PRC PARO expression VIRG expression VIRG expression VIRG expression VIRG block PARF {
+                        rect_data_t* data = (rect_data_t*)malloc(sizeof(rect_data_t));
+                        data->x1 = $3;
+                        data->y1 = $5;
+                        data->x2 = $7;
+                        data->y2 = $9;
+                        data->b = $11;
+                        $$ = create_instruction(RECT_INSTRUCTION, data);
+                    }
+                    | FRECT_PRC PARO expression VIRG expression VIRG expression VIRG expression VIRG block PARF {
+                        frect_data_t* data = (frect_data_t*)malloc(sizeof(frect_data_t));
+                        data->x1 = $3;
+                        data->y1 = $5;
+                        data->x2 = $7;
+                        data->y2 = $9;
+                        data->b = $11;
+                        $$ = create_instruction(FRECT_INSTRUCTION, data);
+                    }
+                    | HLINE_PRC PARO expression VIRG expression VIRG expression VIRG block PARF {
+                        hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
+                        data->x = $3;
+                        data->y = $5;
+                        data->l = $7;
+                        data->b = $9;
+                        $$ = create_instruction(HLINE_INSTRUCTION, data);
+                    }
+                    | VLINE_PRC PARO expression VIRG expression VIRG expression VIRG block PARF {
+                        vline_data_t* data = (vline_data_t*)malloc(sizeof(vline_data_t));
+                        data->x = $3;
+                        data->y = $5;
+                        data->l = $7;
+                        data->b = $9;
+                        $$ = create_instruction(VLINE_INSTRUCTION, data);
+                    }
+                    | GATE_PRC PARO expression VIRG expression VIRG expression PARF {
+                        gate_data_t* data = (gate_data_t*)malloc(sizeof(gate_data_t));
+                        data->x = $3;
+                        data->y = $5;
+                        data->n = $7;
+                        $$ = create_instruction(GATE_INSTRUCTION, data);
+                    }
+                    ;
+
+level_file: LEVEL 
+                {
+                    //printf("Table \n");
+                    tableSymbol = table_create();
+                    //table_display(tableSymbol);
+                    //printf("Level \n");
+                    level_init(&level);
+                    //level_display(&level);
+                } 
+                instruction_list END
+                {
+                    printf("Level : \n");
+                    level_display(&level);
+                    table_display(tableSymbol);
+                    table_delete(tableSymbol);
+                }
+        ;
+
+instruction_list :  instruction
+            |   instruction_list instruction 
+            ;
+
+
+instruction :   instructionPUTNombre
+            |   instructionPUTVariable
+            |   instructionAffectation
+            ;
+
+
+instructionPUTNombre : 
+    PUT PARO expression VIRG  
+    {
+        // Création d'une nouvelle structure block_t
+        block_t b;
+        // Affectation des coordonnées X et Y
+        b.coordX = $3.value;
+        yyval.block = b;
+        // printf("1) X : %d - Y :  %d\n", b.coordX, b.coordY);
+    } 
+    expression VIRG 
+    {
+        // Création d'une nouvelle structure block_t
+        block_t b;
+        // Affectation des coordonnées X et Y
+        b.coordY = $6.value;
+        yyval.block = b;
+        // printf("2) X : %d - Y : %d \n",b.coordX, b.coordY);
+    }
+    instructionBlock PARF
+    ;
+
+instructionPUTVariable :
+    PUT PARO SYMBOLE VIRG
+    {
+        symbol_t *sym1, *var1, *symbol1;
+
+        sym1 = table_search(tableSymbol, $3.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        block_t b;
+        b.coordX = var1->value;
+        yyval.block = b;
+    } expression VIRG 
+    {
+        block_t b;
+        b.coordY = $6.value;
+        yyval.block = b;
+    }
+    instructionBlock PARF
+    |
+    PUT PARO expression  VIRG
+    {
+        block_t b;
+        b.coordX = $6.value;
+        yyval.block = b;
+    } SYMBOLE VIRG 
+    {
+        symbol_t *sym1, *var1, *symbol1;
+
+        sym1 = table_search(tableSymbol, $3.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        block_t b;
+        b.coordY = var1->value;
+        yyval.block = b;
+    }
+    instructionBlock PARF
+    |
+        PUT PARO SYMBOLE  VIRG
+    {
+        symbol_t *sym1, *var1, *symbol1;
+
+        sym1 = table_search(tableSymbol, $3.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        block_t b;
+        b.coordX = var1->value;
+        yyval.block = b;
+    } SYMBOLE VIRG 
+    {
+        symbol_t *sym1, *var1, *symbol1;
+
+        sym1 = table_search(tableSymbol, $3.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        block_t b;
+        b.coordY = var1->value;
+        yyval.block = b;
+    }
+    instructionBlock PARF
+    ;
+
+
+instructionAffectation :
+    SYMBOLE EGALE NUM // X = 1
+    {
+        //printf("%s - %d\n", $1.lettre, $3.value);
+        symbol_t* symbol = symbol_create($1.lettre, $3.value);
+        //symbol_display(symbol);
+        //lst_symbol_t* lst = lst_symbol_create(symbol);
+        //lst_symbol_display(lst);
+        table_add(tableSymbol, symbol);
+        //table_display(tableSymbol);
+        //printf("---------------------------------------------------------------- \n");
+    }
+    | SYMBOLE EGALE SYMBOLE ADDITION NUM  // X = X + 1 OU X = Y + 1
+    {
+        symbol_t *sym1, *var1, *symbol1;
+        symbol_t *sym2, *var2, *symbol2;
+
+        sym1 = table_search(tableSymbol, $1.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($1.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        sym2 = table_search(tableSymbol, $3.lettre);
+        if (sym2 == NULL) {
+            symbol2 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol2);
+            var2 = symbol2;
+        } else {
+            var2 = sym2;
+        }
+
+        int res = var1->value + var2->value + $5.value;
+
+        symbol_set_value(var1, res);
+    }
+    | SYMBOLE EGALE SYMBOLE ADDITION SYMBOLE // X = X + Y
+    {
+        symbol_t *sym1, *var1, *symbol1;
+        symbol_t *sym2, *var2, *symbol2;
+        symbol_t *sym3, *var3, *symbol3;
+
+        sym1 = table_search(tableSymbol, $1.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($1.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        sym2 = table_search(tableSymbol, $3.lettre);
+        if (sym2 == NULL) {
+            symbol2 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol2);
+            var2 = symbol2;
+        } else {
+            var2 = sym2;
+        }
+
+        sym3 = table_search(tableSymbol, $5.lettre);
+        if (sym3 == NULL) {
+            symbol3 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol3);
+            var3 = symbol2;
+        } else {
+            var3 = sym3;
+        }
+
+        var1->value = var1->value + var2->value + var3->value;
+
+        symbol_set_value(var1, var1->value);
+    }
+    | SYMBOLE EGALE SYMBOLE   // X = X ou X = Y
+    {
+        symbol_t *sym1, *var1, *symbol1;
+        symbol_t *sym2, *var2, *symbol2;
+
+        sym1 = table_search(tableSymbol, $1.lettre);
+        if (sym1 == NULL) {
+            symbol1 = symbol_create($1.lettre, 0);
+            table_add(tableSymbol, symbol1);
+            var1 = symbol1;
+        } else {
+            var1 = sym1;
+        }
+
+        sym2 = table_search(tableSymbol, $3.lettre);
+        if (sym2 == NULL) {
+            symbol2 = symbol_create($3.lettre, 0);
+            table_add(tableSymbol, symbol2);
+            var2 = symbol2;
+        } else {
+            var2 = sym2;
+        }
+
+        var1->value = var2->value;
+
+        symbol_set_value(var1, var1->value);
+    }
+    ;
+
+instructionBlock : 
+                    block
+                    {
+                        // printf("Block ! \n");
+                    }
+                    |
+                    GET PARO NUM VIRG NUM PARF 
+                    {
+                        // printf("GET ! \n");
+                        // printf("X : %2d - Y : %2d \n", $3.value , $5.value);
+                        int x = $3.value ;
+                        int y = $5.value ;
+                        get_block(&level, x, y);
+                        // print_block_type(block);
+                    }
+                    ;
+
+expression : 
+    | NUM ADDITION NUM	{ $$.value = $1.value + $3.value; }
+	| NUM SOUSTRACTION NUM	{ $$.value = $1.value - $3.value; }
+	| '-' NUM			{ $$.value = -$2.value; }
+	| NUM MULTIPLICATION NUM	{ $$.value = $1.value * $3.value; }
+	| NUM DIVISION NUM	{
+		if ($3.value == 0) {
+			printf("Error: division by zero : %d / %d\n", $1.value, $3.value);
+            exit(1);
+		}
+		else
+			$$.value = $1.value / $3.value;
+	}
+	| '(' NUM ')'		{ $$.value = $2.value; }
+    | NUM { $$.value = $1.value;}
+    | NUM EGALE NUM { $$.value = $3.value;}
+	;
+
+block: BLOCK_YACC 
+                    {
+                        block_t b;
+                        b.type = BLOCK;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : ", b.coordX, b.coordY, b.value);
+                        level_add_block(&level, b.coordX,  b.coordY);
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : %s \n", b.coordX, b.coordY, b.value, print_block_type(b));
+                    }
+    | TRAP_YACC 
+                    {
+                        block_t b;
+                        b.type = TRAP;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : TRAP \n", b.coordX, b.coordY, b.value);
+                        level_add_trap(&level, b.coordX,  b.coordY);
+                    }
+    | LIFE_YACC
+                    {
+                        block_t b;
+                        b.type = LIFE;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : LIFE \n", b.coordX, b.coordY, b.value);
+                        level_add_life(&level, b.coordX,  b.coordY);
+                    }
+    | BOMB_YACC 
+                    {
+                        block_t b;
+                        b.type = BOMB;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : BOMB \n", b.coordX, b.coordY, b.value);
+                        level_add_bomb(&level, b.coordX,  b.coordY);
+                    }
+    | DOOR_YACC PARO expression PARF
+                    {   
+                        block_t b;
+                        b.type = DOOR;
+                        b.value = $3.value;
+
+                        if (b.value < 0 || b.value > 100) {
+                            fprintf(stderr, "Invalid door number: %2d\n", b.value);
+                            exit(EXIT_FAILURE);
+                        }
+
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : DOOR \n", b.coordX, b.coordY, b.value);
+                        level_add_door(&level, b.coordX, b.coordY, b.value);
+                    }
+    | ENTER_YACC 
+                    {
+                        block_t b;
+                        b.type = ENTER;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : ENTER \n", b.coordX, b.coordY, b.value);
+                        level_add_start(&level, b.coordX,  b.coordY);
+                    }
+    | EXIT_YACC 
+                    {
+                        block_t b;
+                        b.type = EXIT;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : EXIT \n", b.coordX, b.coordY, b.value);
+                        level_add_exit(&level, b.coordX,  b.coordY);
+                    }
+    | LADDER_YACC 
+                    {
+                        block_t b;
+                        b.type = LADDER;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : LADDER \n", b.coordX, b.coordY, b.value);
+                        level_add_ladder(&level, b.coordX,  b.coordY);
+                    }
+    | ROBOT_YACC 
+                    {
+                        block_t b;
+                        b.type = ROBOT;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : ROBOT \n", b.coordX, b.coordY, b.value);
+                        level_add_robot(&level, b.coordX,  b.coordY);
+                    }
+    | PROBE_YACC 
+                    {
+                        block_t b;
+                        b.type = PROBE;
+                        b.value = 0; // Valeur par défaut
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : PROBE \n", b.coordX, b.coordY, b.value);
+                        level_add_probe(&level, b.coordX,  b.coordY);
+                    }
+    | KEY_YACC PARO expression PARF
+                    {
+                        block_t b;
+                        b.type = KEY;
+                        b.value = $3.value;
+
+                        if (b.value < 0 || b.value > 4) {
+                            fprintf(stderr, "Invalid key number: %2d\n", b.value);
+                            exit(EXIT_FAILURE);
+                        }
+
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : KEY \n", b.coordX, b.coordY, b.value);
+                        level_add_key(&level, b.coordX, b.coordY, b.value);
+                    }
+    | GATE_YACC PARO expression PARF 
+                    {
+                        block_t b;
+                        b.type = GATE;
+                        b.value = $3.value;
+
+                        if (b.value < 0 || b.value > 4) {
+                            fprintf(stderr, "Invalid gate number: %2d\n", b.value);
+                            exit(EXIT_FAILURE);
+                        }
+
+                        yyval.block = b;
+                        b.coordX = yyval.block.coordX;
+                        b.coordY = yyval.block.coordY;
+                        // printf("X : %2d - Y : %2d - Value : %2d - Block Name : GATE \n", b.coordX, b.coordY, b.value);
+                        level_add_gate(&level, b.coordX, b.coordY, b.value);
+                    }
+            ;
+
+%%
+

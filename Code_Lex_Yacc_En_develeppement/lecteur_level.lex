@@ -4,10 +4,12 @@
     #include <wchar.h>
     #include <string.h>
     
+    #include "instructions_lst.h"
     #include "symbol_table.h"
 
     #include "block.h"
     #include "level.h"
+
     #include "y.tab.h"
 
     void yyerror(const char *msg);
@@ -25,7 +27,6 @@
 
 "put"           { return PUT; }
 "get"           { return GET; }
-
 
 "empty"         { return EMPTY_YACC; }
 "BLOCK"         { return BLOCK_YACC; }
@@ -55,6 +56,7 @@
 [a-zA-Z][a-zA-Z0-9]*       { yylval.lettre = strdup(yytext); return SYMBOLE; }
 
 ","             {return VIRG; }
+";"             { return PVRIG; }
 
 "("             {return PARO; }
 ")"             {return PARF; }
@@ -64,6 +66,8 @@
 "*"             { return MULTIPLICATION; }
 "/"             { return DIVISION; }
 "="             { return EGALE; }
+"<="            { return SUPEGAL; }
+"<"             { return SUP; }
 
 \n            { yylineno++; }
 [[:space:]]+    {}
