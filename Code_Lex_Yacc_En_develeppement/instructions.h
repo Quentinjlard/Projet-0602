@@ -1,7 +1,7 @@
 /**
  * @file instrcutions.h
  * @author JUILLIARD Quentin (quentin.juilliard@etudiant.univ-reims.fr)
- * @brief 
+ * @brief Declaration of an instruction data structure and related functions
  * @version 0.1
  * @date 2023-03-22
  * 
@@ -23,7 +23,7 @@ typedef enum instruction_type_type{
     FOR_LOOP_INSTRUCTION,
     LADDER_INSTRUCTION,
     RECT_INSTRUCTION,
-    FRECT_INSTRUCTION,
+    frect,
     HLINE_INSTRUCTION,
     VLINE_INSTRUCTION,
     GATE_INSTRUCTION,
@@ -83,8 +83,20 @@ typedef struct instruction_type{
     void* data;
 } instruction_t;
 
+/**
+ * @brief Create a instruction object
+ * 
+ * @param type The type of instruction to be created
+ * @param data A pointer to the data associated with the instruction
+ * @return instruction_t* Pointer to the newly created instruction
+ */
 instruction_t* create_instruction(instruction_type_t type,void* data);
 
+/**
+ * @brief Print an instruction
+ * 
+ * @param instruction Pointer to the instruction to be printed
+ */
 void print_instruction(instruction_t* instruction);
 
 #endif

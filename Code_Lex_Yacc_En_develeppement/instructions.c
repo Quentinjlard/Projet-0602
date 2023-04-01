@@ -65,7 +65,7 @@ void print_instruction(instruction_t* instruction) {
             printf("  y2: %s - %d\n", symbol_get_name(rect_data->y2), symbol_get_value(rect_data->y2));
             printf("  block: %s\n", rect_data->block);
             break;
-        case FRECT_INSTRUCTION:
+        case frect:
             printf("FRECT\n");
             frect_data_t* frect_data = (frect_data_t*)instruction->data;
             printf("  x1: %s - %d\n", symbol_get_name(frect_data->x1), symbol_get_value(frect_data->x1));

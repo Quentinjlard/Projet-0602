@@ -36,10 +36,10 @@ typedef struct block_type{
 } block_t;
 
 /**
- * @brief 
+ * @brief Returns the type of a block in char
  * 
- * @param block 
- * @return char* 
+ * @param block The block to be printed
+ * @return char* A pointer to the printed block type
  */
 char* print_block_type(block_t block);
 

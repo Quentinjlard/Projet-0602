@@ -73,6 +73,7 @@
 
     instruction :   instructionPUTNombre
                 |   instructionPUTVariable
+                |   instructionProcedure
                 |   affectation
                 |   END
                 {
@@ -144,8 +145,9 @@
                         }       VLINE_PROC FOR_LOOP_PROC PUT_PROC END
                     |   END
                     {
-                        print_instruction_list(listeInstruction);
-                        printf("\n \n ");
+                        /* level_display(&level); */
+                        /* print_instruction_list(listeInstruction); */
+                        /* printf("\n \n "); */
                     }
                     | level_file
                     ;
@@ -213,7 +215,7 @@
                     data->y2 = symbolY2;
                     data->block = symbolB->name;
 
-                    instruction_t* frectInstruction = create_instruction(FRECT_INSTRUCTION, data);
+                    instruction_t* frectInstruction = create_instruction(frect, data);
                     /* print_instruction(frectInstruction); */
 
                     instruction_node_t* frectNode = create_node(frectInstruction);
@@ -488,7 +490,26 @@
             yyval.block = b;
         }
         instructionBlock PARF
-        ;        
+        ;   
+
+
+    instructionProcedure : 
+        FRECT_YACC PARO NUM VIRG NUM VIRG NUM VIRG NUM VIRG BLOCK_YACC PARF
+        {
+            symbol_t* symbolX1 = table_search(tableSymbol, "x1");
+            symbol_set_value(symbolX1, $3.value);
+            symbol_t* symbolX2 = table_search(tableSymbol, "x2");
+            symbol_set_value(symbolX2, $5.value);
+            symbol_t* symbolY1 = table_search(tableSymbol, "y1");
+            symbol_set_value(symbolY1, $7.value);
+            symbol_t* symbolY2 = table_search(tableSymbol, "y2");
+            symbol_set_value(symbolY2, $9.value);
+            
+            instruction_node_t* res = find_instruction_node_by_type(listeInstruction, frect);
+            print_instruction_list_node(res);
+
+        } 
+        ;    
 
     affectation : 
                 SYMBOLE 

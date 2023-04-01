@@ -56,6 +56,12 @@ void table_add(table_t* table, symbol_t* symbol);
  */
 symbol_t* table_search(table_t* table, char* name);
 
+/**
+ * @brief Get the first symbol in the given symbol table.
+ * 
+ * @param table Pointer to the symbol table to search.
+ * @return symbol_t* A pointer to the first symbol in the table, or NULL if the table is 
+ */
 symbol_t* table_get_first_symbol(table_t* table);
 
 

@@ -51,6 +51,7 @@
 "for"           { return FOR_YACC; }
 "while"         { return WHILE_YACC; }
 
+
 [0-9]+        { yylval.value = atoi(yytext); return NUM; }
 
 [a-zA-Z][a-zA-Z0-9]*       { yylval.lettre = strdup(yytext); return SYMBOLE; }
