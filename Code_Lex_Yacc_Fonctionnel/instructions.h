@@ -67,9 +67,9 @@ typedef struct vline_data_type{
 } vline_data_t;
 
 typedef struct gate_data_type{
-    int x;
-    int y;
-    int n;
+    symbol_t*  x;
+    symbol_t* y;
+    symbol_t* n;
 } gate_data_t;
 
 typedef struct put_data_type{

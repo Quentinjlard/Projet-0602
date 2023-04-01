@@ -56,5 +56,7 @@ void table_add(table_t* table, symbol_t* symbol);
  */
 symbol_t* table_search(table_t* table, char* name);
 
+symbol_t* table_get_first_symbol(table_t* table);
+
 
 #endif

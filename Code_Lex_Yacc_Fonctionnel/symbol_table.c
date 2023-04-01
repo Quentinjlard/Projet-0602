@@ -25,7 +25,6 @@ void table_display(table_t* table) {
 
 void table_delete(table_t* table) {
     lst_symbol_delete(table->head);
-    printf("Table des symboles supprimée.\n");
 }
 
 void table_add(table_t* table, symbol_t* symbol) {
@@ -40,4 +39,11 @@ symbol_t* table_search(table_t* table, char* name) {
         return NULL;
     }
     return lst->symbol;
+}
+
+symbol_t* table_get_first_symbol(table_t* table) {
+    if (!table || !table->head) {
+        return NULL;
+    }
+    return table->head->symbol;
 }

@@ -107,7 +107,8 @@ block.o: block.c block.h level.h
 symbol.o: symbol.c symbol.h
 symbol_lst.o: symbol_lst.c symbol_lst.h symbol.h
 symbol_table.o: symbol_table.c symbol_table.h symbol_lst.h symbol.h
-instructions.o: instructions.c instructions.h symbol.h block.h
+instructions.o: instructions.c instructions.h symbol.h block.h \
+ instructions_lst.h
 instructions_lst.o: instructions_lst.c instructions_lst.h instructions.h \
  symbol.h block.h
 lecteur_level.o: lecteur_level.c block.h level.h

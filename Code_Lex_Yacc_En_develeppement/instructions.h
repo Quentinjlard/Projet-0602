@@ -87,6 +87,4 @@ instruction_t* create_instruction(instruction_type_t type,void* data);
 
 void print_instruction(instruction_t* instruction);
 
-char* concat(char* str1, char* str2);
-
 #endif

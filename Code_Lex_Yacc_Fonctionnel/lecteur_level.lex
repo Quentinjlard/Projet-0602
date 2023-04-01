@@ -9,6 +9,7 @@
 
     #include "block.h"
     #include "level.h"
+
     #include "y.tab.h"
 
     void yyerror(const char *msg);
@@ -26,7 +27,6 @@
 
 "put"           { return PUT; }
 "get"           { return GET; }
-
 
 "empty"         { return EMPTY_YACC; }
 "BLOCK"         { return BLOCK_YACC; }

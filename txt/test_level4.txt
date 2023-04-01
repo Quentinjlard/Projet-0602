@@ -14,3 +14,27 @@ prc rect(x1,y1,x2,y2,b)
     put(x2,i,b)
   end
 end
+
+prc frect(x1,y1,x2,y2,b)
+  for(i=x1;i<=x2;i=i+1)
+    for(j=y1;j<=y2;j=j+1)
+      put(i,j,b)
+    end
+  end
+end
+
+prc hline(x,y,l,b)
+  for(i=x;i<x+l;i=i+1)
+    put(i,y,b)
+  end
+end
+
+prc vline(x,y,l,b)
+  for(i=y;i<y+l;i=i+1)
+    put(x,i,b)
+  end
+end
+
+level
+  frect(0,0,59,3,BLOCK)
+end

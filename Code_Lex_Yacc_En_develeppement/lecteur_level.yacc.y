@@ -80,6 +80,7 @@
                         level_display(&level);
                         table_display(tableSymbol);
                         table_delete(tableSymbol);
+                        /* clear_instruction_list(listeInstruction); */
                     }
                 ;
 
@@ -100,46 +101,51 @@
                     
                         PRC_YACC
                         {
-                            printf("LADDER instruction \n");
+                            /* printf("=> LADDER instruction \n"); */
                                 if (listeInstruction == NULL)
-                                    listeInstruction = new_instruction_list();
+                                    listeInstruction = create_list();
                                 if(tableSymbol == NULL)
                                     tableSymbol = table_create();                                
                                 // table_display(tableSymbol);
                         }    LADDER_PROC FOR_LOOP_PROC PUT_PROC END
                     |   PRC_YACC{
+                                /* printf("\n=> REC instruction \n"); */
                                 if (listeInstruction == NULL)
-                                    listeInstruction = new_instruction_list();
+                                    listeInstruction = create_list();
                                 if(tableSymbol == NULL)
                                     tableSymbol = table_create();
                                 // table_display(tableSymbol);
                         }       RECT_PROC FOR_LOOP_PROC PUT_PROC PUT_PROC END FOR_LOOP_PROC PUT_PROC PUT_PROC END
                     |   PRC_YACC{
+                                /* printf("\n=> FREC instruction \n"); */
                                 if (listeInstruction == NULL)
-                                    listeInstruction = new_instruction_list();
+                                    listeInstruction = create_list();
                                 if(tableSymbol == NULL)
                                     tableSymbol = table_create();
                                 // table_display(tableSymbol);
                         }       FRECT_PROC FOR_LOOP_PROC FOR_LOOP_PROC PUT_PROC END END
                     |   PRC_YACC{
+                                /* printf("\n=> HLINE instruction \n"); */
                                 if (listeInstruction == NULL)
-                                    listeInstruction = new_instruction_list();
+                                    listeInstruction = create_list();
                                 if(tableSymbol == NULL)
                                     tableSymbol = table_create();
                                 // table_display(tableSymbol);
+                                
+
                         }       HLINE_PROC FOR_LOOP_PROC PUT_PROC END   
                     |   PRC_YACC{
+                                /* printf("\n=> VLINE instruction \n"); */
                                 if (listeInstruction == NULL)
-                                    listeInstruction = new_instruction_list();
+                                    listeInstruction = create_list();
                                 if(tableSymbol == NULL)
                                     tableSymbol = table_create();
                                 // table_display(tableSymbol);
                         }       VLINE_PROC FOR_LOOP_PROC PUT_PROC END
-                    | FOR_LOOP_PROC
                     |   END
                     {
-                        printf("\n");
-                        table_display(tableSymbol);
+                        print_instruction_list(listeInstruction);
+                        printf("\n \n ");
                     }
                     | level_file
                     ;
@@ -157,8 +163,12 @@
                     data->y = symbolY;
                     data->h = symbolH;
 
+                    
                     instruction_t* ladderIsntruction = create_instruction(LADDER_INSTRUCTION, data);
-                    print_instruction(ladderIsntruction);
+                    /* print_instruction(ladderIsntruction); */
+                    instruction_node_t* ladderNode = create_node(ladderIsntruction);
+                    add_node_to_list(listeInstruction, ladderNode);
+
                 }
                 ;
 
@@ -179,44 +189,87 @@
                     data->block = symbolB->name;
 
                     instruction_t* rectInstruction = create_instruction(RECT_INSTRUCTION, data);
-                    print_instruction(rectInstruction);
+                    /* print_instruction(rectInstruction); */
+
+                    instruction_node_t* rectNode = create_node(rectInstruction);
+                    add_node_to_list(listeInstruction, rectNode);
+
+
                 };
 
     FRECT_PROC : FRECT_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation VIRG affectation PARF {
-                    printf("FRECT_PRC \n");
-                    rect_data_t* data = (rect_data_t*)malloc(sizeof(rect_data_t));
+                    /* printf("FRECT_PRC \n"); */
+                    symbol_t* symbolX1 = table_search(tableSymbol, "x1");
+                    symbol_t* symbolX2 = table_search(tableSymbol, "x2");
+                    symbol_t* symbolY1 = table_search(tableSymbol, "y1");
+                    symbol_t* symbolY2 = table_search(tableSymbol, "y2");
+                    symbol_t* symbolB = table_search(tableSymbol, "b");
+
+                    frect_data_t* data = (frect_data_t*)malloc(sizeof(frect_data_t));
                     
-                    data->x1 = $3.symbol;
-                    data->y2 = $5.symbol;
-                    data->x2 = $7.symbol;
-                    data->y2 = $9.symbol;
-                    data->block = $11.symbol->name;
+                    data->x1 = symbolX1;
+                    data->x2 = symbolX2;
+                    data->y1 = symbolY1;
+                    data->y2 = symbolY2;
+                    data->block = symbolB->name;
+
+                    instruction_t* frectInstruction = create_instruction(FRECT_INSTRUCTION, data);
+                    /* print_instruction(frectInstruction); */
+
+                    instruction_node_t* frectNode = create_node(frectInstruction);
+                    add_node_to_list(listeInstruction, frectNode);
                 };
 
     HLINE_PROC : HLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF {
-                    printf("HLINE_PROC \n");
+                    /* printf("HLINE_PROC \n"); */
+
+                    symbol_t* symbolX = table_search(tableSymbol, "x");
+                    symbol_t* symbolY = table_search(tableSymbol, "y");
+                    symbol_t* symbolL = table_search(tableSymbol, "l");
+                    symbol_t* symbolB = table_search(tableSymbol, "b");
+
                     hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
                     
-                    data->x = $3.symbol;
-                    data->y = $5.symbol;
-                    data->l = $7.symbol;
-                    data->block = $9.symbol->name;
+                    data->x = symbolX;
+                    data->y = symbolY;
+                    data->l = symbolL;
+                    data->block = symbolB->name;
+
+                    instruction_t* hlineInstruction = create_instruction(HLINE_INSTRUCTION, data);
+                    /* print_instruction(hlineInstruction); */
+
+                    instruction_node_t* hlineNode = create_node(hlineInstruction);
+                    add_node_to_list(listeInstruction, hlineNode);
+
                 };
 
     VLINE_PROC : VLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF {
-                    printf("VLINE_PROC \n");
+                    /* printf("VLINE_PROC \n"); */
+
+                    symbol_t* symbolX = table_search(tableSymbol, "x");
+                    symbol_t* symbolY = table_search(tableSymbol, "y");
+                    symbol_t* symbolL = table_search(tableSymbol, "l");
+                    symbol_t* symbolB = table_search(tableSymbol, "b");
+
                     hline_data_t* data = (hline_data_t*)malloc(sizeof(hline_data_t));
                     
-                    data->x = $3.symbol;
-                    data->y = $5.symbol;
-                    data->l = $7.symbol;
-                    data->block = $9.symbol->name;
+                    data->x = symbolX;
+                    data->y = symbolY;
+                    data->l = symbolL;
+                    data->block = symbolB->name;
+
+                    instruction_t* vLineInstruction = create_instruction(VLINE_INSTRUCTION, data);
+                    /* print_instruction(vLineInstruction); */
+
+                    instruction_node_t*  vLineNode = create_node(vLineInstruction);
+                    add_node_to_list(listeInstruction, vLineNode);
+
                 };
 
     FOR_LOOP_PROC : 
                 FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL SYMBOLE PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
                 {
-                    /* printf("1. FOR_LOOP_PROC \n"); */
+                    /* printf("1. FOR_LOOP_PROC \n");  */
                 
                     symbol_t* symbolX1 = table_search(tableSymbol, "x1");
                     symbol_t* symbolX2 = table_search(tableSymbol, "x2");
@@ -236,8 +289,11 @@
                     data->step = $13.value;
 
                     instruction_t* forLoopInstruction = create_instruction(FOR_LOOP_INSTRUCTION, data);
-                    print_instruction(forLoopInstruction);
-
+                    /* print_instruction(forLoopInstruction); */
+                    
+                    instruction_node_t* forLoopNode = create_node(forLoopInstruction);
+                    add_node_to_list(listeInstruction,forLoopNode);
+                    
                 }
                 | FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL SYMBOLE ADDITION SYMBOLE SOUSTRACTION NUM PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
                 {
@@ -257,39 +313,53 @@
                     data->step = $17.value;
 
                     instruction_t* forLoopInstruction = create_instruction(FOR_LOOP_INSTRUCTION, data);
-                    print_instruction(forLoopInstruction);
-
+                    /* print_instruction(forLoopInstruction); */
+                    instruction_node_t* forLoopNode = create_node(forLoopInstruction);
+                    add_node_to_list(listeInstruction,forLoopNode);
+                    
                 }
                 | FOR_YACC PARO affectation PVRIGULE affectation SUP affectation ADDITION affectation PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
                 {
-                    printf("3. FOR_LOOP_PROC \n");
+                    /* printf("3. FOR_LOOP_PROC \n"); */
+
+                    symbol_t* symbolI = table_search(tableSymbol, "i");
+                    symbol_t* symbolX = table_search(tableSymbol, "x");
+                    symbol_t* symbolL = table_search(tableSymbol, "l");
+                
                     for_loop_data_t* data = (for_loop_data_t*)malloc(sizeof(for_loop_data_t));
                     symbol_t* symbol = symbol_create("endLoop", 0);
-                    int value = $7.symbol->value + $9.symbol->value;
+                    int value = symbolX->value + symbolL->value;
                     table_add(tableSymbol, symbol);
                     symbol_set_value(symbol, value);
                     
 
-                    data->variable = $3.symbol;
-                    data->start = $5.symbol;
+                    data->variable = symbolI;
+                    data->start = symbolX;
                     data->end = symbol;
-                    data->step = $14.value;
+                    data->step = $15.value;
+
+                    instruction_t* forLoopInstruction = create_instruction(FOR_LOOP_INSTRUCTION, data);
+                    /* print_instruction(forLoopInstruction); */
+                    instruction_node_t* forLoopNode = create_node(forLoopInstruction);
+                    add_node_to_list(listeInstruction,forLoopNode);
                 }
                 ;
 
     PUT_PROC : PUT PARO SYMBOLE VIRG SYMBOLE VIRG LADDER_YACC PARF  {
 
                     symbol_t* symbolX = table_search(tableSymbol, $3.lettre);
-                    symbol_t* symbolI = table_search(tableSymbol, $5.lettre);
+                    symbol_t* symbolY = table_search(tableSymbol, $5.lettre);
 
                     put_data_t* data = (put_data_t*)malloc(sizeof(put_data_t));
                     
                     data->x = symbolX;
-                    data->y = symbolI;
-                    data->block = "LADDER";
+                    data->y = symbolY;
+                    data->block = $7.lettre;
 
                     instruction_t* putLadder = create_instruction(PUT_INSTRUCTION, data);
-                    print_instruction(putLadder);
+                    instruction_node_t* putLadder_node = create_node(putLadder);
+                    add_node_to_list(listeInstruction,putLadder_node);
+                    /* print_instruction(putLadder); */
                 }
                 |
                 PUT PARO SYMBOLE VIRG SYMBOLE VIRG SYMBOLE PARF  {
@@ -305,8 +375,11 @@
                     data->y = symbolY;
                     data->block = $7.lettre;
 
-                    instruction_t* putProc = create_instruction(PUT_INSTRUCTION, data);
-                    print_instruction(putProc);
+                    instruction_t* putLadder = create_instruction(PUT_INSTRUCTION, data);
+                    instruction_node_t* putLadder_node = create_node(putLadder);
+                    add_node_to_list(listeInstruction,putLadder_node);
+                    /* print_instruction(putProc); */
+                    
                 }
                 ;
 
@@ -415,7 +488,7 @@
             yyval.block = b;
         }
         instructionBlock PARF
-        ;
+        ;        
 
     affectation : 
                 SYMBOLE 

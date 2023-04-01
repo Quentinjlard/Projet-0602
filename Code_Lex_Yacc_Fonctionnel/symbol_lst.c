@@ -33,7 +33,6 @@ void lst_symbol_delete(lst_symbol_t* lst) {
         free(lst);
         lst = next;
     }
-    printf("Liste de symboles supprimée.\n");
 }
 
 lst_symbol_t* lst_symbol_search(lst_symbol_t* lst, char* name) {

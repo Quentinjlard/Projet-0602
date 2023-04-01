@@ -3,27 +3,29 @@
 
 #include "instructions_lst.h"
 
-instruction_list_t* new_instruction_list() {
-    instruction_list_t* list = (instruction_list_t*)malloc(sizeof(instruction_list_t));
+instruction_list_t* create_list() {
+    instruction_list_t* list = malloc(sizeof(instruction_list_t));
     list->head = NULL;
     list->tail = NULL;
     return list;
 }
 
-instruction_list_node_t* new_instruction_list_node(instruction_t* instruction) {
-    instruction_list_node_t* node = (instruction_list_node_t*)malloc(sizeof(instruction_list_node_t));
+instruction_node_t* create_node(instruction_t* instruction) {
+    instruction_node_t* node = malloc(sizeof(instruction_node_t));
     node->instruction = instruction;
     node->next = NULL;
     return node;
 }
 
-void add_instruction(instruction_list_t* list, instruction_t* instruction) {
-    instruction_list_node_t* node = new_instruction_list_node(instruction);
-    if (list->tail == NULL) {
+void add_instruction_to_node(instruction_node_t* node, instruction_t* instruction) {
+    node->instruction = instruction;
+}
+
+void add_node_to_list(instruction_list_t* list, instruction_node_t* node) {
+    if (list->head == NULL) {
         list->head = node;
         list->tail = node;
-    }
-    else {
+    } else {
         list->tail->next = node;
         list->tail = node;
     }
@@ -31,7 +33,7 @@ void add_instruction(instruction_list_t* list, instruction_t* instruction) {
 
 void remove_first_instruction(instruction_list_t* list) {
     if (list->head != NULL) {
-        instruction_list_node_t* node = list->head;
+        instruction_node_t* node = list->head;
         list->head = node->next;
         if (list->tail == node) {
             list->tail = NULL;
@@ -50,7 +52,7 @@ void clear_instruction_list(instruction_list_t* list) {
 
 int get_instruction_list_length(instruction_list_t* list) {
     int length = 0;
-    instruction_list_node_t* current = list->head;
+    instruction_node_t* current = list->head;
     while (current != NULL) {
         length++;
         current = current->next;
@@ -60,16 +62,23 @@ int get_instruction_list_length(instruction_list_t* list) {
 
 void print_instruction_list(instruction_list_t* list) {
     if (list == NULL || list->head == NULL) {
-        printf("Empty instruction list\n");
+        printf("\nEmpty instruction list.\n");
         return;
     }
-
-    printf("Instruction list : \n");
-    instruction_list_node_t* current_node = list->head;
-
-    while (current_node != NULL) {
-        printf("\t");
-        print_instruction(current_node->instruction);
-        current_node = current_node->next;
+    printf("\nInstruction list:\n");
+    instruction_node_t* current = list->head;
+    while (current != NULL) {
+        printf("Node:\n");
+        print_instruction(current->instruction);
+        current = current->next;
     }
+}
+
+void print_instruction_list_node(instruction_node_t* node) {
+    if (node == NULL) {
+        printf("Empty instruction list node.\n");
+        return;
+    }
+    printf("Instruction list node:\n");
+    print_instruction(node->instruction);
 }

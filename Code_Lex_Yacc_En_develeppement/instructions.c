@@ -32,7 +32,7 @@ void print_instruction(instruction_t* instruction) {
             printf("WHILE LOOP\n");
             break;
         case FOR_LOOP_INSTRUCTION:
-            printf("\nFOR LOOP\n");
+            printf("FOR LOOP\n");
             for_loop_data_t* for_loop_data = (for_loop_data_t*)instruction->data;
             if (instruction->data != NULL) {
                 for_loop_data = (for_loop_data_t*)instruction->data;
@@ -43,11 +43,9 @@ void print_instruction(instruction_t* instruction) {
                 printf("  End : %s - %d\n", symbol_get_name(for_loop_data->end), symbol_get_value(for_loop_data->end));
                 printf("  STEP : %d\n", for_loop_data->step);
             }
-            printf("\n");
-            break;
             break;
         case LADDER_INSTRUCTION:
-            printf("\nLADDER\n");
+            printf("LADDER\n");
             ladder_data_t* ladder_data = NULL;
             if (instruction->data != NULL) {
                 ladder_data = (ladder_data_t*)instruction->data;
@@ -57,7 +55,6 @@ void print_instruction(instruction_t* instruction) {
                 printf("  y: %s - %d\n", symbol_get_name(ladder_data->y), symbol_get_value(ladder_data->y));
                 printf("  h: %s - %d\n", symbol_get_name(ladder_data->h), symbol_get_value(ladder_data->h));
             }
-            printf("\n");
             break;
         case RECT_INSTRUCTION:
             printf("RECT\n");
@@ -110,16 +107,5 @@ void print_instruction(instruction_t* instruction) {
         default:
             printf("Unknown instruction\n");
             break;
-    }
-}
-
-char* concat(char* str1, char* str2) {
-    if (str1 != NULL && str2 != NULL) {
-        char* result = malloc(strlen(str1) + strlen(str2) + 1);
-        strcpy(result, str1);
-        strcat(result, str2);
-        return result;
-    } else {
-        return NULL;
     }
 }
