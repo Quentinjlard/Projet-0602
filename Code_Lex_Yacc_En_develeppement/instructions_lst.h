@@ -60,7 +60,7 @@ void print_instruction_list(instruction_list_t* list);
 
 void print_instruction_list_node(instruction_node_t* node);
 
-
+instruction_node_t* find_instruction_node_by_type(instruction_list_t* list, instruction_type_t type);
 
 #endif 
 /* __INSTRUCTIONS_LST_H__ */
