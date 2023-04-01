@@ -34,3 +34,6 @@ prc vline(x,y,l,b)
     put(x,i,b)
   end
 end
+
+level
+end

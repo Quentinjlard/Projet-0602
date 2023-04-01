@@ -40,3 +40,23 @@ symbol_t* table_search(table_t* table, char* name) {
     }
     return lst->symbol;
 }
+
+symbol_t* table_get_first_symbol(table_t* table) {
+    if (!table || !table->head) {
+        return NULL;
+    }
+    return table->head->symbol;
+}
+
+symbol_t* table_search_by_index(table_t* table, int index) {
+    lst_symbol_t* current = table->head;
+    int i = 0;
+    while (current != NULL) {
+        if (i == index) {
+            return current->symbol;
+        }
+        current = current->next;
+        i++;
+    }
+    return NULL;
+}

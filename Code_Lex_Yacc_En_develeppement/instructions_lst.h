@@ -38,7 +38,7 @@ typedef struct for_loop_data_type{
     symbol_t* variable;
     symbol_t* start;
     symbol_t* end;
-    symbol_t* step;
+    int step;
     instruction_list_t* loop_instructions;
 } for_loop_data_t;
 
