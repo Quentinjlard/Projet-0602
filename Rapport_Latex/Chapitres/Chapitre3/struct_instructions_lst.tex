@@ -1,0 +1,43 @@
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Structure pour une liste instruction]
+typedef struct instruction_list_node_type {
+    instruction_t* instruction;
+    struct instruction_list_node_type* next;
+} instruction_node_t;
+
+typedef struct instruction_list_type{
+    instruction_node_t* head;
+    instruction_node_t* tail;
+} instruction_list_t;
+
+typedef struct call_procedure_data_type{
+    char* procedure_name;
+    instruction_list_t* arguments;
+} call_procedure_data_t;
+
+typedef struct assignment_data_type{
+    char* variable_name;
+    instruction_t* value_expression;
+} assignment_data_t;
+
+typedef struct conditional_data_type{
+    instruction_t* condition_expression;
+    instruction_list_t* then_instructions;
+    instruction_list_t* else_instructions;
+} conditional_data_t;
+
+typedef struct while_loop_data_type{
+    instruction_t* condition_expression;
+    instruction_list_t* loop_instructions;
+} while_loop_data_t;
+
+typedef struct for_loop_data_type{
+    symbol_t* variable;
+    symbol_t* start;
+    symbol_t* end;
+    int step;
+    instruction_list_t* loop_instructions;
+} for_loop_data_t;
+\end{lstlisting}
+
+\newpage

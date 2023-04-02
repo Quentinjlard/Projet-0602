@@ -1,0 +1,76 @@
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Structure pour une instruction]
+typedef enum instruction_type_type{
+    CALL_PROCEDURE_INSTRUCTION,
+    ASSIGNMENT_INSTRUCTION,
+    CONDITIONAL_INSTRUCTION,
+    WHILE_LOOP_INSTRUCTION,
+    FOR_LOOP_INSTRUCTION,
+    LADDER_INSTRUCTION,
+    RECT_INSTRUCTION,
+    FRECT_INSTRUCTION,
+    HLINE_INSTRUCTION,
+    VLINE_INSTRUCTION,
+    GATE_INSTRUCTION,
+    PUT_INSTRUCTION
+} instruction_type_t;
+
+typedef struct ladder_data_type{
+    symbol_t* x;
+    symbol_t* y;
+    symbol_t* h;
+} ladder_data_t;
+
+typedef struct rect_data_type{
+    symbol_t* x1;
+    symbol_t* y1;
+    symbol_t* x2;
+    symbol_t* y2;
+    char* block;
+} rect_data_t;
+
+typedef struct frect_data_type{
+    symbol_t* x1;
+    symbol_t* y1;
+    symbol_t* x2;
+    symbol_t* y2;
+    char* block;
+} frect_data_t;
+
+typedef struct hline_data_type{
+    symbol_t* x;
+    symbol_t* y;
+    symbol_t* l;
+    char* block;
+} hline_data_t;
+
+typedef struct vline_data_type{
+    symbol_t* x;
+    symbol_t* y;
+    symbol_t* l;
+    char* block;
+} vline_data_t;
+
+typedef struct gate_data_type{
+    symbol_t*  x;
+    symbol_t* y;
+    symbol_t* n;
+} gate_data_t;
+
+typedef struct put_data_type{
+    symbol_t* x;
+    symbol_t* y;
+    char* block;
+} put_data_t;
+
+typedef struct instruction_type{
+    instruction_type_t type;
+    void* data;
+} instruction_t;
+\end{lstlisting}
+
+Dans ce code, nous avons l'ensemble des structures pour les instructions que nous avons besoin pour le projet.
+
+Chaque structure de données est définies avec des chalmps spécifique pour stockers les informations qu'ils ont besoin tel que les coordonnés en X et Y, la hautteur etc...
+
+\newpage

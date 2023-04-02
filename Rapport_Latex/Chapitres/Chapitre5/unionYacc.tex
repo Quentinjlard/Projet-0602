@@ -1,0 +1,25 @@
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Union Yacc]
+%union {
+        block_t block;
+        int value;
+        int coordX;
+        int coordY;
+        char* lettre;
+        symbol_t* symbol;
+    }
+
+\end{lstlisting}
+
+Le bloc si-dessus est un bloc d'union qui est utiliser pour stocker divers types de donnés durant l'analyse syntaxique. Nous utiliserons dans notre projet six type de donnés différents : 
+
+\begin{itemize}
+    \item block\_t block : Membre de type block\_t vue dans le chapitre précédant.
+    \item int value : Champ de type int qui se nomme value dans notre code Yacc
+    \item int coordX: Champ pour stocker un Coordonnées X
+    \item int coordY: Champ pour stocker un Coordonnées Y
+    \item char* lettre: Champ de type char* pour stocker des mots ou des lettres
+    \item symbol\_t* symbol: Champs permettant le stockage de tous type de symbole.
+\end{itemize}
+
+\newpage

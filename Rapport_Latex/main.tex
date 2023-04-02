@@ -1,0 +1,159 @@
+\documentclass[a4paper, 11pt]{report}
+\usepackage{setspace}
+\setstretch{1,15}
+%\usepackage{newunicodechar}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{fontspec}
+\setmainfont{Verdana}
+\usepackage{lipsum}
+\renewcommand{\thesection}{\arabic{section}}
+\usepackage{ulem}
+\usepackage{geometry}
+\geometry{hmargin=2.5cm,vmargin=3.5cm}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{framed}
+
+
+
+\usepackage{listings}
+
+\usepackage{xcolor}
+
+%New colors defined below
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0,0,1}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%Code listing style named "mystyle"
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour}, commentstyle=\color{codegreen},
+  keywordstyle=\color{blue},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+
+\author{JUILLIARD-COGNE}
+
+
+%%exemple titre : Un semestre à cracovie:
+%% Entre orient et occident
+%%De l'autre coté du rideau de fer
+%%Associé à l'Est, veut se rapprocher de l'Ouest
+
+
+\begin{document}
+
+\pagestyle{fancy}
+
+\fancyhead{}\fancyfoot{}
+%\fancyhead[ER]{Projet SALE} Fonctionne que si en mode book
+%\fancyhead[ER]{L3 informatique Reims Année 2022-2023} Fonctionne que si en mode book
+
+\fancyhead[L]{JUILLIARD Quentin - COGNE Romain} 
+\fancyhead[R]{\thepage} 
+\fancyfoot[R]{Année Universitaire 2022 - 2023}
+
+\begin{title}
+
+\title{
+    {\Huge Générateur de Monde }\\
+    \vspace{1 cm}
+    {\LARGE JUILLIARD Quentin S6O7}\\
+    {\LARGE COGNE Romain S6O6}\\
+    \vspace{2.5 cm}
+    {\includegraphics[width=80mm, height=40mm]{logo_univ}}\\
+    \vspace{2.5 cm}
+    {\Large Monsieur RABAT, INFO0602 / Département Informatique}\\
+    \vspace{1 cm}
+    {\date{\Large Jeudi 23 mars 2023}}}
+\end{title}
+
+\maketitle
+\tableofcontents
+\clearpage
+
+%\pagenumbering{arabic}
+
+\section{Introduction}
+\input{Chapitres/Chapitre1/introduction}
+
+\section{Organisation générale}
+\input{Chapitres/Chapitre2/Lancement.tex}
+
+\subsection{Organisation des fichiers}
+\input{Chapitres/Chapitre2/OrganisationFichier}
+
+\subsection{Compilation et lancement}
+\input{Chapitres/Chapitre2/Compilation&Lancement}
+
+\section{Strcutures utilisées}
+
+\subsection{Structure d'un level}
+\input{Chapitres/Chapitre3/struct_level}
+
+\subsection{Strcuture d'un bloc}
+\input{Chapitres/Chapitre3/struct_block}
+
+\subsection{Structure d'un symbole}
+\input{Chapitres/Chapitre3/struct_symbol}
+
+\subsection{Structure d'une liste de symbole}
+\input{Chapitres/Chapitre3/struct_symbol_lst}
+
+\subsection{Structure d'une table de symbole}
+\input{Chapitres/Chapitre3/struct_symbol_table}
+
+\subsection{Structure d'une instruction}
+\input{Chapitres/Chapitre3/struct_instruction}
+
+\subsection{Structure d'une liste d'instructions}
+\input{Chapitres/Chapitre3/struct_instructions_lst}
+
+\section{Section Lex}
+
+\subsection{Nos options}
+\input{Chapitres/Chapitre4/optionLex}
+
+\subsection{Notre message d'erreur}
+\input{Chapitres/Chapitre4/erreurMessage}
+
+\subsection{Notre analyseur syntaxique}
+\input{Chapitres/Chapitre4/analyseurLex}
+
+\section{Section Yacc}
+
+\subsection{Notre Union}
+\input{Chapitres/Chapitre5/unionYacc}
+
+\subsection{Nos Token}
+\input{Chapitres/Chapitre5/tokenYacc}
+
+\subsection{Notre grammaire}
+\input{Chapitres/Chapitre5/grammaireYacc}
+
+
+\section{Scénarios}
+\input{Chapitres/Chapitre6/Scenario0}
+
+\section{Conclusion}
+\input{Chapitres/Chapitre7/conclusion}
+
+\input{Chapitres/Annexes/Annexes.tex}
+
+\end{document}

@@ -1,0 +1,13 @@
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Message d'erreur]
+void yyerror(const char *msg)
+{
+    fprintf(stderr, "Erreur ligne %d : %s\n", yylineno, msg);
+}
+
+\end{lstlisting}
+
+La fonction yyerror est un focntion permettant la gestion des erreurs dans notre programme utilisant les analyseurs lexical Lex&Yacc. 
+Cette fonction premet en paramére un message \textit{msg} qui indique l'erreur rencontrée. En plus, de nous donner l'erreur rencontré, nous avons ajouter l'affichage de la ligne d'erreur grâce à la variable globale \textit{yylineo}.
+
+\newpage

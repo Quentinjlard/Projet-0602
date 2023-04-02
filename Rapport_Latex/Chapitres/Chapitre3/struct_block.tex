@@ -1,0 +1,38 @@
+
+
+%"mystyle" code listing set
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Structure d'uun Block]
+typedef enum block_name_type{
+    EMPTY,
+    BLOCK,
+    TRAP,
+    LIFE,
+    BOMB,
+    DOOR,
+    ENTER,
+    EXIT,
+    LADDER,
+    ROBOT,
+    PROBE,
+    KEY,
+    GATE
+} block_name_t;
+
+typedef struct block_type{
+    block_name_t type;
+    int value;
+    int coordX;
+    int coordY;
+} block_t;
+\end{lstlisting}
+
+Les structures présentent ci-dessus sont une énumération nommée \textit{block\_name\_type} et une structure nommée \textit{block\_t}.
+
+L'énumération \textit{block\_name\_type} définit différents types de blocs que nous pouvons reprouvé dans un niveau du jeu.
+
+la structure \textit{block\_t} contient quatre membre. Le premier est son type du block présent sur la map de type \textit{block\_name\_type}. Le second est la value par défaut la value est à 0 néamois quand il s'agit d'une porte, d'une clé sa valeur change, la value est de de type \textit{int}. Un bloc posséde une position sur notre map en X et Y pour cela nous avons deux variable intitulé \textit{coordX} et \textit{coordY} qui sont de type \textit{int}.
+
+Pour conclure, la structure \textit{block\_t} permet de stocker les informations de chaque blocs présent sur la map du jeu. 
+
+\newpage

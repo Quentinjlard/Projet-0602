@@ -1,0 +1,18 @@
+%"mystyle" code listing set
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Structure d'une liste de symbole]
+typedef struct lst_symbol_type {
+    symbol_t* symbol;
+    struct lst_symbol_t* next;
+} lst_symbol_t;
+
+\end{lstlisting}
+
+Le code décrit ci-dessous est une structure intitulé \textit{lst\_symbole\_type}. Il se compose de deux membres. Le premeir est \textit{symbole}, il s'agit d'un pointeur vers une variable de type \textit{symbol\_t} et le second est \textit{next}, il s'agit d'un pointeur qui pointe vers la prochaine structure de type \textit{lst\_symbole\_type} dans la liste chaînée.
+
+Nous réalisons donc une liste chaînée, une structure de donnéés, qui lis les éléments entre eux pas des pointeur.  Dans notre cas, chaque élément de cette liste est défini par une structure \textit{lst\_symbole\_type} qui contient la référence du suviant grâce à la variable \textit{next}.
+
+Dans cette structure, nous stockons des éléments de type \textit{symbole}.
+
+
+\newpage

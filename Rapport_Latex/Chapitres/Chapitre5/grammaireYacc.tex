@@ -1,0 +1,370 @@
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Régle généraliste pour la bonne lecture d'un fichier]
+file: level_file_list
+        | instruction_proc_list
+        ;
+
+    level_file_list: level_file
+                    | level_file_list level_file
+                ;
+
+    instruction_proc_list: instruction_proc
+                    | instruction_proc_list instruction_proc
+                    ;
+
+    instruction_list :  instruction_list instruction
+                |   instruction
+                ;
+
+    instruction :   instructionPUTNombre
+                |   instructionPUTVariable
+                |   instructionProcedure
+                |   affectation
+                |   END {....}
+                ;
+\end{lstlisting}
+
+La régle de grammaire nommé \textit{file} possédent deux options. La premiére option a pour but de contruitre une liste de fichiers de niveau.  Ellle peremt de combiner plusieurs niveaux dans un fichier. La seconde option permet de contruire une liste d'intructions procédure.
+
+La régle de grammaire nommé \textit{level\_file\_list} possédent deux optiosn aussi. La premier est dans le cas, nous avons que un seul niveau dans notre fichier. La seconde est écrite dans le cas ou nous avons plusieurs niveaux dans le même fichier.
+
+La régle de grammaire nommé \textit{instruction\_proc\_list} possédent deux options aussi pour les même raison que la grammaire \textit{level\_file\_list}.
+
+La régle de grammaire \textit{isntruction} possédent de multiples possibilité de travail. La prémiere consiste a faire exécutrer des option PUT avec des coordonnés X et Y qui sont numérique. La seconde option consiste à remplacer les coordonnés X et Y par des variable ( symbole ) qui peuvent subire des opérations de calcul entre elle. La troisiéme sert dans le cas où nous devons poser un bloc sur la map depuis une instruction/procédure définit au paravant. la troisiéme est une opération d'affection, elle peremt d'assigner des valeur à des variable (symbole). La derniére régle est le TOKEN end pour dire qu'il s'agit la fin d'un cycle et peut-être la fin du fichier. Les \textit{\{...\}} signifie qu'il y a des instructions en C dans cette accolade qu'on ne developpera pas dans le rapport.
+\newpage
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Lecture d'un niveau]
+    level_file: LEVEL {....} instruction_list ;
+\end{lstlisting}
+
+La régle \textit{level\_file} commence par le token LEVEL ce qui marque le début d'un niveau. Nous avons ensuite une suite d'instruction en C. Pouis finit nous faissons appel à une autre grammaire présente dans plus huate pour pouvoir crée des cycles de lecture du fichier.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Grammaire pour l'instruction d'une procédure]
+    instruction_proc : 
+                    
+                        PRC_YACC
+                        {
+                            ...
+                        }    LADDER_PROC FOR_LOOP_PROC PUT_PROC END
+                    |   PRC_YACC{
+                            ...
+                        }   RECT_PROC FOR_LOOP_PROC PUT_PROC PUT_PROC END FOR_LOOP_PROC PUT_PROC PUT_PROC END
+                    |   PRC_YACC{
+                            ...
+                        }   FRECT_PROC FOR_LOOP_PROC FOR_LOOP_PROC PUT_PROC END END
+                    |   PRC_YACC{
+                            ...
+                        }   HLINE_PROC FOR_LOOP_PROC PUT_PROC END   
+                    |   PRC_YACC{
+                            ...
+                        }   VLINE_PROC FOR_LOOP_PROC PUT_PROC END
+                    |   END
+                    {
+                        ...
+                    }
+                    | level_file
+                    ;
+    ;
+\end{lstlisting}
+
+Nous allons voir à prensent la régle de production qui se nomme \textit{instructions\_proc}.
+Cette régles est composé de sept membres. Nous allons voir pour commencer les cinqs premiers puis nous verrons les deux dernieres par la suite.
+
+Les cinqs premiéres instructions commencent par un symbole non-terminal (PRC\_YACC) suivi d'une séquence d'autre symboles non-terminaux et terminaux.
+Avec les insctructions procédures (PRC\_YACC) donnés dans l'extrait de code ci-dessus, nous pouvons réaliser les procédures donné dans le fichier texte test.
+Si nous prenons pourexemple la procédure pour posser une echelle, nous pouvons voir que nous aurons une boucles dans la quelle nous auront une instrcution PUT qui nous permettera de la poser sur la map. A la suite de ca nous avons le END qui permet de données la fin des instruction présente dans la boucles.
+Nous avons gardés cette même réflexion pour les autres procédures.
+
+L'instruction END qui est à la fin nous permet de données la fin d'une procédure.
+L'instruction \textit{level\_file}, nous permet de passer sur la génération d'un monde à la suite d'un enregistrement de divers procédure dans notre mémoire.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Régle de grammaire pour les différentes procédures]
+LADDER_PROC : LADDER_PRC_YACC PARO affectation VIRG affectation VIRG affectation PARF 
+                {
+                   ...
+                }
+                ;
+
+    RECT_PROC : RECT_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation VIRG affectation PARF 
+                {
+                    ...
+                };
+
+    FRECT_PROC : FRECT_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation VIRG affectation PARF 
+                {
+                    ...
+                };
+
+    HLINE_PROC : HLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF 
+                {
+                    ...
+                };
+
+    VLINE_PROC : VLINE_YACC PARO affectation VIRG affectation VIRG affectation VIRG affectation PARF 
+                {
+                    ...
+                };
+
+    FOR_LOOP_PROC : 
+                FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL SYMBOLE PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
+                {
+                    ...
+                }
+                | FOR_YACC PARO affectation PVRIGULE affectation SUPEGAL SYMBOLE ADDITION SYMBOLE SOUSTRACTION NUM PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
+                {
+                    ...
+                }
+                | FOR_YACC PARO affectation PVRIGULE affectation SUP affectation ADDITION affectation PVRIGULE SYMBOLE EGALE SYMBOLE ADDITION NUM PARF
+                {
+                    ...
+                }
+                ;
+
+    PUT_PROC : PUT PARO SYMBOLE VIRG SYMBOLE VIRG LADDER_YACC PARF  
+                {
+                    ...
+                }
+                |
+                PUT PARO SYMBOLE VIRG SYMBOLE VIRG SYMBOLE PARF  
+                {
+                    ...
+                }
+                ;
+
+\end{lstlisting}
+
+L'ensemble des instructions ci-dessus représente les procédure que nous pouvons rencontrer dans nos fichiers de test. L'ensemble des procédures prennent en entrée et produisent dans le code {...} un résultat de sortie comme le stockage des varaibles nécessaires à la bonne exécution de l'ensemble des procédures.
+
+
+Nous allons vous expliquer rapidement chaque instruction : 
+
+\begin{itemize}
+
+\item \textit{LADDER\_PROC} est une instruction qui permet de crée une échelle en utilisant trois paramétres. Les trois paramétre sont génére depuis la grammaire d'affectation que nous verrons plus tard.
+
+\item \textit{RECT\_PROC} est une instuction qui a pour but de crée un rectangle en utilisant cinq paramétres en utilisant la régle de grammaire d'affectation.
+
+\item \textit{FRECT\_PROC} est une instuction qui a pour but de crée un rectangle plein en utilisant cinq paramétres en utilisant la régle de grammaire d'affectation.
+
+\item \textit{HLINE\_PROC} est une instuction qui a pour but de crée une ligne horizontale en utilisant trois paramétres en utilisant la régle de grammaire d'affectation.
+
+\item \textit{VLINE\_PROC} est une instuction qui a pour but de crée une ligne verticale en utilisant trois paramétres en utilisant la régle de grammaire d'affectation.
+
+\item \textit{FOR\_LOOP\_PROC} est une instruction qui permet de crée une boucle for avec plusieurs symbole qui sont directement gerer par affectation. Il y a trois type de boucle spécifier dans cette grammaire car nous avons les boucle for avec une condition d'arrete superieur ou égale ou juste supérieur et celle où nous faissons des sommes de différents symbole pour obtenir une condition d'arret. Les paramétre nécessaire sont une variable de départ, de fin, une variable et un pas d'augmentation d'où le \textit{ SYMBOLE EGALE SYMBOLE ADDITION NUM} qui permet de définir le pas.
+
+\item \textit{PUT\_PROC} Il s'agit d'une isntruction qui met en place à l'écran le bloc demandé. Quand il s'agit d'une échelle, nous avons fait une régle spécifique vis à vis d'un probléme rencontrer avec la régle dans le fichier Lex sur LADDER.
+
+\end{itemize}
+
+\newpage
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=]
+instructionPUTNombre : 
+        PUT PARO expression VIRG  
+        {
+            ...
+        } 
+        expression VIRG 
+        {
+            ...
+        }
+        instructionBlock PARF
+        ;
+\end{lstlisting}
+
+Cette régle de grammaire définit la syntaxe pour une instruction "PUT" qui met en place un block sur une map level.
+Nous allons voir chaque partie de cette instruction.
+Pour la premiére partie, nous définissions le coordonnés en X de notre bloc. Pour la seconde partie, nous faissons de même mais pour le coordonnée en Y. Dans la derniére ligne de cette instruction, nous allons rechercher les la grammaire instructionBlock qui nous sera détaillé plus tard mais qui permet de placer un block sur la map.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=]
+instructionPUTVariable :
+        PUT PARO SYMBOLE VIRG
+        {
+            ...
+        } expression VIRG 
+        {
+            ...
+        }
+        instructionBlock PARF
+        |
+        PUT PARO expression  VIRG
+        {
+            ...
+        } SYMBOLE VIRG 
+        {
+            ...
+        }
+        instructionBlock PARF
+        |
+        PUT PARO SYMBOLE  VIRG
+        {
+            ...
+        } SYMBOLE VIRG 
+        {
+            ...
+        }
+        instructionBlock PARF
+        ;   
+\end{lstlisting}
+
+La régle de grammaire \textit{instructionPUTVariable} permet de faire passer soit une varaible ou un nombre en paramétre pour donner les coordonés d'un bloc. Elle appelera ensuite la régle de grammaire \textit{instructionBlock} en lui passant des coordonnées X et Y. Nous verrons la régle \textit{instructionBlock} dans la suite de ce rapport.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Affectation d'un symbole]
+    affectation : 
+                SYMBOLE 
+                {
+                    ...
+                }
+                |
+                SYMBOLE EGALE NUM 
+                {
+                    ...
+                }
+                |
+                SYMBOLE EGALE SYMBOLE 
+                {
+                    ...
+                }
+                |
+                SYMBOLE EGALE SYMBOLE ADDITION NUM {
+                    ...
+                }
+                |
+                SYMBOLE EGALE SYMBOLE ADDITION SYMBOLE {
+                    ...
+                }
+                ;
+\end{lstlisting}
+
+La régle de grammaire d'\textit{affectation} consiste à donner une valeur à une varaible. Dans cette grammaire, nous avons plusieurs régles pour spécifier les type d'affectation possible.
+
+La prémiére règle, il s'agit de transformer une lettre en un symbole en mettant la valeur de la lettre à 0. ( X )
+
+La seconde a pour but d'affecter un nombre à une varaiable en utilisant un traitement en language C adapté ( X = 2 ) 
+
+La troiséme a pour but de faire la somme du contenu du variable avec un nombre ( X = X + 1 )
+
+La quatriéme a pour but de faire la somme de deux symbole. ( X = X + Y )
+
+Chaque bloc de régle est suivi par des accolades qui permettent de réaliser les actions à effectuer. Ces actions peuvent être la création d'un symbole dans la table de symbole, la mise à jour d'un symbole en modifiant la variable ou réaliser tout type d'opération nécessaire à la bonne gestion des symbole.
+
+
+\newpage
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Expression de calcul pour les nombres]
+    expression : 
+        | NUM ADDITION NUM	{ ... }
+        | NUM SOUSTRACTION NUM	{ ... }
+        | NUM MULTIPLICATION NUM	{ ... }
+        | NUM DIVISION NUM	
+        {
+            ...
+        }
+        | '(' NUM ')'		{... }
+        | NUM { ... }
+        | NUM EGALE NUM { .. }
+        ;
+\end{lstlisting}
+
+La régle de grammaire \textit{expression} permet de réaliser des opérations mathématique entre deux nomnbre.
+Les opérations mathématiques que nous pouvons réaliser sont les additions, les soustractions, les multiplication, les divisions ( avec verification des diviseurs ) ainsi que comparée si deux nombres sont égales.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=instruction pour un Block]
+    instructionBlock : 
+                        block
+                        {
+                            ...
+                        }
+                        |
+                        GET PARO NUM VIRG NUM PARF 
+                        {
+                            ...
+                        }
+                        ;
+\end{lstlisting}
+
+La régle de grammaire \textit{instructionBlock} permet soit de lancer l'édition d'un bloc sur la map ou soit de dire le contenu d'un bloc sur un point précis de la map.
+La premiere régle de grammaire envoie directement sur la grammaire bloc qu'on verra par la suite  \textit{block}.
+La seconde régle de grammaire a pour but de recupere les valeurs et de les mettre dans des variable X et U pour aprés aire une recherche dans notre tableau de Bloc.
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Bloc]
+block: BLOCK_YACC 
+                        {
+                            ...
+                        }
+        | TRAP_YACC 
+                        {
+                            ...
+                        }
+        | LIFE_YACC
+                        {
+                            ...
+                        }
+        | BOMB_YACC 
+                        {
+                            ...
+                        }
+        | DOOR_YACC PARO expression PARF
+                        {   
+                            ...
+                        }
+        | ENTER_YACC 
+                        {
+                            ...
+                        }
+        | EXIT_YACC 
+                        {
+                            ...
+                        }
+        | LADDER_YACC 
+                        {
+                            ...
+                        }
+        | ROBOT_YACC 
+                        {
+                            ...
+                        }
+        | PROBE_YACC 
+                        {
+                            ...
+                        }
+        | KEY_YACC PARO expression PARF
+                        {
+                            ...
+                        }
+        | GATE_YACC PARO expression PARF 
+                        {
+                            ...
+                        }
+                ;
+\end{lstlisting}
+
+Dans cette grammaire, nous pouvons voir que nous avons que le noms des block et pour certains une expression.
+
+Pour tous ceux qui où il y a que le nom du bloc on exécutera directement la méthode pour l'intégrer à la map.
+Pour ceux qui posséder une expressions permet d'ajouter une options tel que le numero de la porte ou le numéro de la clé / Porte. 
+
+
+\newpage
+
+\lstset{style=mystyle}
+\begin{lstlisting}[caption=Bloc]
+    instructionProcedure : 
+        FRECT_YACC PARO NUM VIRG NUM VIRG NUM VIRG NUM VIRG BLOCK_YACC PARF
+        {
+            ...
+        } 
+        ;    
+\end{lstlisting}
+
+La grammaire sert à lire les appel procédure dans la partie LEVEL ... END
+
+\newpage

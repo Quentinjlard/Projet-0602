@@ -1,0 +1,14 @@
+%"mystyle" code listing set
+\lstset{style=mystyle}
+\begin{lstlisting}[language=C, caption=Structure d'un symbole]
+typedef struct symbol_type {
+    char* name;
+    int value;
+} symbol_t;
+\end{lstlisting}
+
+Dans le code ci-dessus nommée \textit{symbol\_t}, nous avons deux membres. Le premier membre est un pointeur vers un table de cractéres qui défini le nom du symbole. Le second membre est un entier qui correspond à la valeur d'affectation du symbole, il est de type int.
+
+Néanmois, il faut noter que le nom d'un symbole n'a pas de taille fixe vue qu'il s'agit d'un pointeur vers un char.
+
+\newpage
