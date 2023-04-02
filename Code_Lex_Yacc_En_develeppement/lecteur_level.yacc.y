@@ -260,7 +260,7 @@
                     data->l = symbolL;
                     data->block = symbolB->name;
 
-                    instruction_t* vLineInstruction = create_instruction(VLINE_INSTRUCTION, data);
+                    instruction_t* vLineInstruction = create_instruction(vline, data);
                     /* print_instruction(vLineInstruction); */
 
                     instruction_node_t*  vLineNode = create_node(vLineInstruction);
@@ -496,19 +496,110 @@
     instructionProcedure : 
         FRECT_YACC PARO NUM VIRG NUM VIRG NUM VIRG NUM VIRG BLOCK_YACC PARF
         {
+            printf("FRECT_YACC\n");
             symbol_t* symbolX1 = table_search(tableSymbol, "x1");
             symbol_set_value(symbolX1, $3.value);
-            symbol_t* symbolX2 = table_search(tableSymbol, "x2");
-            symbol_set_value(symbolX2, $5.value);
             symbol_t* symbolY1 = table_search(tableSymbol, "y1");
-            symbol_set_value(symbolY1, $7.value);
+            symbol_set_value(symbolY1, $5.value);
+            symbol_t* symbolX2 = table_search(tableSymbol, "x2");
+            symbol_set_value(symbolX2, $7.value);
             symbol_t* symbolY2 = table_search(tableSymbol, "y2");
             symbol_set_value(symbolY2, $9.value);
+            symbol_t* symbolI = table_search(tableSymbol, "i");
+            symbol_t* symbolJ = table_search(tableSymbol, "j");
             
-            instruction_node_t* res = find_instruction_node_by_type(listeInstruction, frect);
-            print_instruction_list_node(res);
+            /* instruction_node_t* frect1 = find_instruction_node_by_type(listeInstruction, frect);
+            instruction_node_t* frectFor = frect1->next;
+            instruction_node_t* frectForFor = frectFor->next; */
+            /* print_instruction_list_node(frect1);
+            print_instruction_list_node(frectFor);
+            print_instruction_list_node(frectForFor); */
 
+            for(symbolI->value = symbolX1->value;symbolI->value<=symbolX2->value;symbolI->value=symbolI->value+1)
+                for(symbolJ->value=symbolY1->value;symbolJ->value<=symbolY2->value;symbolJ->value=symbolJ->value+1)
+                    level_add_block(&level, symbolI->value,  symbolJ->value);
+            
         } 
+        | VLINE_YACC PARO NUM VIRG NUM VIRG NUM VIRG BLOCK_YACC PARF
+        {
+            printf("VLINE_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            symbol_t* symbolL = table_search(tableSymbol, "l");
+            symbol_set_value(symbolL, $7.value);
+            symbol_t* symbolI = table_search(tableSymbol, "i");
+
+            for(symbolI->value = symbolY->value;symbolI->value<symbolY->value+symbolL->value;symbolI->value=symbolI->value+1)
+                level_add_block(&level, symbolX->value,  symbolI->value);
+        }
+        | LADDER_PRC_YACC PARO NUM VIRG NUM VIRG NUM PARF
+        {
+            //VIRG NUM VIRG NUM
+            printf("LADDER_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            symbol_t* symbolH = table_search(tableSymbol, "h");
+            symbol_set_value(symbolH, $7.value);
+            symbol_t* symbolI = table_search(tableSymbol, "i");
+            symbol_set_value(symbolI, 0);
+
+            for(symbolI->value = symbolY->value;symbolI->value<symbolY->value+symbolH->value+1;symbolI->value=symbolI->value+1)
+                level_add_ladder(&level, symbolX->value,  symbolI->value);
+        }
+        | PUT PARO NUM VIRG NUM VIRG ENTER_YACC PARF
+        {
+            printf("ENTER_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            
+            level_add_start(&level, symbolX->value,  symbolY->value);
+        }
+        | PUT PARO NUM VIRG NUM VIRG ROBOT_YACC PARF
+        {
+            printf("ROBOT_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            
+            level_add_robot(&level, symbolX->value,  symbolY->value);
+        }
+        | PUT PARO NUM VIRG NUM VIRG BOMB_YACC PARF
+        {
+            printf("BOMB_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            
+            level_add_bomb(&level, symbolX->value,  symbolY->value);
+        }
+        | PUT PARO NUM VIRG NUM VIRG KEY_YACC PARO NUM PARF PARF
+        {
+            printf("KEY_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            
+            level_add_key(&level, symbolX->value,  symbolY->value, $9.value);
+        }
+        | PUT PARO NUM VIRG NUM VIRG DOOR_YACC PARO NUM PARF PARF
+        {
+            printf("DOOR_YACC\n");
+            symbol_t* symbolX = table_search(tableSymbol, "x");
+            symbol_set_value(symbolX, $3.value);
+            symbol_t* symbolY = table_search(tableSymbol, "y");
+            symbol_set_value(symbolY, $5.value);
+            
+            level_add_door(&level, symbolX->value,  symbolY->value, $9.value);
+        }
         ;    
 
     affectation : 

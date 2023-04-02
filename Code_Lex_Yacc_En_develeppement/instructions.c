@@ -82,7 +82,7 @@ void print_instruction(instruction_t* instruction) {
             printf("  l: %s - %d\n", symbol_get_name(hline_data->l), symbol_get_value(hline_data->l));
             printf("  block: %s\n", hline_data->block);
             break;
-        case VLINE_INSTRUCTION:
+        case vline:
             printf("VLINE\n");
             vline_data_t* vline_data = (vline_data_t*)instruction->data;
             printf("  x: %s - %d\n", symbol_get_name(vline_data->x), symbol_get_value(vline_data->x));

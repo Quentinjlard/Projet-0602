@@ -82,3 +82,19 @@ void print_instruction_list_node(instruction_node_t* node) {
     printf("Instruction list node:\n");
     print_instruction(node->instruction);
 }
+
+instruction_node_t* find_instruction_node_by_type(instruction_list_t* list, instruction_type_t type) {
+    if (list == NULL || list->head == NULL) {
+        return NULL;
+    }
+
+    instruction_node_t* current = list->head;
+    while (current != NULL) {
+        if (current->instruction->type == type) {
+            return current;
+        }
+        current = current->next;
+    }
+
+    return NULL; // instruction not found
+}

@@ -25,7 +25,7 @@ typedef enum instruction_type_type{
     RECT_INSTRUCTION,
     frect,
     HLINE_INSTRUCTION,
-    VLINE_INSTRUCTION,
+    vline,
     GATE_INSTRUCTION,
     PUT_INSTRUCTION
 } instruction_type_t;

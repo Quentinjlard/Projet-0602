@@ -1,6 +1,7 @@
 /**
 * @file symbol.h
 * @author JUILLIARD Quentin (quentin.juilliard@etudiant.univ-reims.fr)
+* @author COGNE Romain (romain.cogne@etudiant.univ-reims.fr)
 * @brief
 * @version 0.1
 * @date 2023-03-21

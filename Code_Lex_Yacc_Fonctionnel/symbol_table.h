@@ -1,6 +1,7 @@
 /**
  * @file symbol_table.h
  * @author JUILLIARD Quentin (quentin.juilliard@etudiant.univ-reims.fr)
+ * @author COGNE Romain (romain.cogne@etudiant.univ-reims.fr)
  * @brief Defines the interface for a symbol table data structure. 
  * @version 0.1
  * @date 2023-03-21
